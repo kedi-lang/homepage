@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+import httpx
 import pytest
 from pydantic_ai.messages import ModelResponse, ToolCallPart, ToolReturnPart
 from pydantic_ai.models.function import FunctionModel
@@ -11,13 +12,12 @@ from typesafe_sdk import (
     ChoiceAnswer,
     Noul,
     NoulAnswer,
-    Score,
-    ScoreAnswer,
     SystemOneResponse,
     Usage,
 )
 
 from kedi.agent_adapter.adapters import PydanticAdapter
+from kedi.errors import KediExecutionError
 from kedi.lang import compile_program, parse_program
 from kedi_typesafe.integrations.pydantic import TypeSafeModel
 from tests.mock_adapter import AttrDict, MockAdapter
@@ -27,9 +27,17 @@ WEBSITE = Path(__file__).resolve().parents[1]
 EXAMPLES = json.loads((WEBSITE / "src/data/examples.json").read_text())
 
 
+@pytest.fixture(autouse=True)
+def movie_credentials(monkeypatch):
+    monkeypatch.setenv("TMDB_API_KEY", "test-tmdb-token")
+
+
 def run_example(name, adapter):
     return compile_program(
-        parse_program(EXAMPLES[name]["code"]),
+        parse_program(
+            EXAMPLES[name]["code"],
+            source_path=str(WEBSITE / "public/examples" / EXAMPLES[name]["filename"]),
+        ),
         adapter=adapter,
         loop_iteration_limit=3,
     ).run_main()
@@ -37,7 +45,13 @@ def run_example(name, adapter):
 
 @pytest.mark.parametrize("name", EXAMPLES)
 def test_examples_compile(name):
-    compile_program(parse_program(EXAMPLES[name]["code"]), adapter=MockAdapter())
+    compile_program(
+        parse_program(
+            EXAMPLES[name]["code"],
+            source_path=str(WEBSITE / "public/examples" / EXAMPLES[name]["filename"]),
+        ),
+        adapter=MockAdapter(),
+    )
 
 
 class ExampleAdapter(MockAdapter):
@@ -55,7 +69,7 @@ class ExampleAdapter(MockAdapter):
 @pytest.mark.parametrize(
     ("name", "fields", "expected"),
     [
-        ("hello", {"owner": "Mira", "needs_approval": True}, "Mira"),
+        ("hello", {"director": "Hayao Miyazaki", "year": 2001, "minutes": 125}, "Hayao Miyazaki"),
         ("python", {"seats": 12, "monthly_usd": 19.0}, 2736.0),
     ],
 )
@@ -63,6 +77,165 @@ def test_template_values_flow_into_program(name, fields, expected):
     adapter = ExampleAdapter(lambda _: fields)
     assert run_example(name, adapter) == expected
     assert len(adapter.calls) == 1
+
+
+@pytest.mark.parametrize("movie_id", [129, 987654])
+def test_movie_details_flow_from_http_into_typed_bindings(monkeypatch, movie_id):
+    calls = []
+
+    def transport(request):
+        assert request.url.host == "api.themoviedb.org"
+        assert request.headers["Authorization"] == "Bearer test-tmdb-token"
+        assert request.extensions["timeout"]["read"] == 10.0
+        calls.append(request.url.path)
+        if request.url.path == "/3/search/movie":
+            assert request.url.params["query"] == "Spirited Away"
+            return httpx.Response(
+                200, json={"results": [{"id": movie_id, "title": "Spirited Away"}]}
+            )
+        assert request.url.path == f"/3/movie/{movie_id}"
+        assert request.url.params["append_to_response"] == "credits"
+        return httpx.Response(
+            200,
+            json={
+                "title": "Spirited Away",
+                "release_date": "2001-07-20",
+                "runtime": 125,
+                "credits": {"crew": [{"job": "Director", "name": "Hayao Miyazaki"}]},
+            },
+        )
+
+    def respond(messages, info):
+        returns = [
+            part
+            for message in messages
+            for part in message.parts
+            if isinstance(part, ToolReturnPart)
+        ]
+        if not returns:
+            return ModelResponse(parts=[ToolCallPart("movie_details", {"title": "Spirited Away"})])
+        assert "Hayao Miyazaki" in str(returns[-1].content)
+        return ModelResponse(
+            parts=[
+                ToolCallPart(
+                    info.output_tools[0].name,
+                    {"director": "Hayao Miyazaki", "year": 2001, "minutes": 125},
+                )
+            ]
+        )
+
+    client_class = httpx.Client
+    monkeypatch.setattr(
+        httpx,
+        "Client",
+        lambda **kwargs: client_class(transport=httpx.MockTransport(transport), **kwargs),
+    )
+    assert run_example("hello", PydanticAdapter(FunctionModel(respond))) == "Hayao Miyazaki"
+    assert calls == ["/3/search/movie", f"/3/movie/{movie_id}"]
+
+
+@pytest.mark.parametrize("failure", [401, 404, 429, 500, "timeout", "invalid-json"])
+@pytest.mark.parametrize("stage", ["search", "details"])
+def test_movie_tool_propagates_http_errors(monkeypatch, failure, stage):
+    def transport(request):
+        if stage == "details" and request.url.path == "/3/search/movie":
+            return httpx.Response(200, json={"results": [{"id": 456, "title": "Spirited Away"}]})
+        if failure == "timeout":
+            raise httpx.ReadTimeout("TMDB request timed out", request=request)
+        if failure == "invalid-json":
+            return httpx.Response(200, text="not JSON")
+        return httpx.Response(failure, json={"status_message": "Request failed"})
+
+    source = '> import: tmdb\n= <movie_details(`"Spirited Away"`)>'
+    client_class = httpx.Client
+    monkeypatch.setattr(
+        httpx,
+        "Client",
+        lambda **kwargs: client_class(transport=httpx.MockTransport(transport), **kwargs),
+    )
+    with pytest.raises(KediExecutionError) as error:
+        compile_program(
+            parse_program(source, source_path=str(WEBSITE / "public/examples/movie_night.kedi")),
+            adapter=MockAdapter(),
+        ).run_main()
+    assert "test-tmdb-token" not in str(error.value)
+    if isinstance(failure, int):
+        assert str(failure) in str(error.value)
+    elif failure == "timeout":
+        assert "TMDB request timed out" in str(error.value)
+    else:
+        assert "JSONDecodeError" in str(error.value)
+
+
+@pytest.mark.parametrize(
+    "results, pages, message",
+    [
+        ([], 1, "No movie found"),
+        (
+            [
+                {"id": 1, "title": "Dune", "release_date": "1984-12-14"},
+                {"id": 2, "title": "Dune", "release_date": "2021-09-15"},
+            ],
+            1,
+            "Ambiguous title",
+        ),
+        ([{"id": 1, "title": "Dune"}], 2, "Ambiguous title"),
+    ],
+)
+def test_movie_lookup_does_not_guess_when_search_is_inconclusive(
+    monkeypatch, results, pages, message
+):
+    def transport(request):
+        assert request.url.path == "/3/search/movie"
+        return httpx.Response(200, json={"results": results, "total_pages": pages})
+
+    client_class = httpx.Client
+    monkeypatch.setattr(
+        httpx,
+        "Client",
+        lambda **kwargs: client_class(transport=httpx.MockTransport(transport), **kwargs),
+    )
+    source = '> import: tmdb\n= <movie_details(`"Dune"`)>'
+    with pytest.raises(KediExecutionError, match=message):
+        compile_program(
+            parse_program(source, source_path=str(WEBSITE / "public/examples/movie_night.kedi")),
+            adapter=MockAdapter(),
+        ).run_main()
+
+
+def test_movie_lookup_can_disambiguate_by_year(monkeypatch):
+    calls = []
+
+    def transport(request):
+        calls.append(request.url.path)
+        if request.url.path == "/3/search/movie":
+            assert request.url.params["query"] == "Dune"
+            assert request.url.params["primary_release_year"] == "1984"
+            return httpx.Response(200, json={"results": [{"id": 841, "title": "Dune"}]})
+        assert request.url.path == "/3/movie/841"
+        return httpx.Response(
+            200,
+            json={
+                "title": "Dune",
+                "release_date": "1984-12-14",
+                "runtime": 137,
+                "credits": {"crew": [{"job": "Director", "name": "David Lynch"}]},
+            },
+        )
+
+    client_class = httpx.Client
+    monkeypatch.setattr(
+        httpx,
+        "Client",
+        lambda **kwargs: client_class(transport=httpx.MockTransport(transport), **kwargs),
+    )
+    source = '> import: tmdb\n= `movie_details("Dune", 1984)`'
+    result = compile_program(
+        parse_program(source, source_path=str(WEBSITE / "public/examples/movie_night.kedi")),
+        adapter=MockAdapter(),
+    ).run_main()
+    assert result["directors"] == ["David Lynch"]
+    assert calls == ["/3/search/movie", "/3/movie/841"]
 
 
 @pytest.mark.parametrize("claim", [True, False])
@@ -113,8 +286,8 @@ def test_record_outputs_and_procedure_returns(name, fields):
 
 
 class JevClient:
-    def __init__(self, *, urgency=1.6, probability=0.93):
-        self.urgency = urgency
+    def __init__(self, *, queue="billing", probability=0.93):
+        self.queue = queue
         self.probability = probability
         self.calls = []
 
@@ -123,28 +296,19 @@ class JevClient:
         answers = {}
         for key, question in questions.items():
             if isinstance(question, Choice):
-                assert dict(question.criteria) == {
-                    "billing": "Payments, refunds, and invoices",
-                    "technical": "Broken software or access",
-                }
+                assert set(question.criteria) == {"billing", "technical"}
                 answers[key] = ChoiceAnswer(
-                    choice="billing",
+                    choice=self.queue,
                     confidence=0.9,
-                    probabilities={"billing": 0.9, "technical": 0.1},
-                )
-            elif isinstance(question, Score):
-                assert list(question.criteria) == ["Routine", "Time-sensitive", "Blocked now"]
-                answers[key] = ScoreAnswer(
-                    score=self.urgency,
-                    confidence=0.8,
-                    legend=dict(enumerate(question.criteria)),
-                    probabilities={0: 1 - self.urgency / 2, 1: 0, 2: self.urgency / 2},
+                    probabilities={
+                        name: 0.9 if name == self.queue else 0.1 for name in question.criteria
+                    },
                 )
             else:
                 assert isinstance(question, Noul)
                 answers[key] = NoulAnswer(noul=self.probability)
         return SystemOneResponse(
-            model="jev-test", usage=Usage(input_tokens=12, output_tokens=3), answers=answers
+            model="jev-test", usage=Usage(input_tokens=12, output_tokens=2), answers=answers
         )
 
     async def aclose(self):
@@ -152,49 +316,29 @@ class JevClient:
 
 
 @pytest.mark.parametrize(
-    ("urgency", "probability", "expected"),
+    ("queue", "probability"),
     [
-        (1.6, 0.93, "priority"),
-        (0.4, 0.2, "standard"),
-        (1.5, 0.2, "priority"),
-        (0.4, 0.8, "priority"),
+        ("billing", 0.93),
+        ("technical", 0.2),
+        ("billing", 0.79),
+        ("billing", 0.8),
+        ("technical", 0.0),
+        ("technical", 1.0),
     ],
 )
-def test_jev_routing_is_one_structured_request(monkeypatch, urgency, probability, expected):
-    client = JevClient(urgency=urgency, probability=probability)
+def test_jev_choices_and_probabilities_share_one_request(monkeypatch, queue, probability):
+    client = JevClient(queue=queue, probability=probability)
     model = TypeSafeModel(client=client)
     monkeypatch.setattr(PydanticAdapter, "_resolve_model", lambda self, name: model)
-    assert run_example("jevRouting", PydanticAdapter(model)) == f"billing/{expected}"
+    assert run_example("jev", PydanticAdapter(model)) == {
+        "queue": queue,
+        "priority": probability >= 0.8,
+    }
     assert len(client.calls) == 1
     state, questions = client.calls[0]
     assert "I was charged twice" in str(state)
-    assert {type(question) for question in questions.values()} == {Choice, Score, Noul}
-    probability_question = next(q for q in questions.values() if isinstance(q, Noul))
-    assert "cancel their subscription" in str(probability_question.criteria)
-
-
-@pytest.mark.parametrize("probability", [0.96, 0.9, 0.2])
-def test_draft_then_jev_review_and_threshold(monkeypatch, probability):
-    draft_calls = []
-    reply = "I can help check delivery before discussing a refund."
-
-    def draft(messages, info):
-        draft_calls.append(messages)
-        return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, {"reply": reply})])
-
-    generator = FunctionModel(draft)
-    client = JevClient(probability=probability)
-    judge = TypeSafeModel(client=client)
-
-    def resolve(self, name):
-        return {"google/gemini-3-flash-preview": generator, "typesafe/jev-latest": judge}[name]
-
-    monkeypatch.setattr(PydanticAdapter, "_resolve_model", resolve)
-    assert run_example("jev", PydanticAdapter(generator)) == (
-        "ready for review" if probability > 0.9 else "needs review"
-    )
-    assert len(draft_calls) == len(client.calls) == 1
-    assert reply in str(client.calls[0][0])
+    assert len(questions) == 2
+    assert {type(question) for question in questions.values()} == {Choice, Noul}
 
 
 def test_stock_tool_reads_supplied_fixture(monkeypatch):
@@ -246,16 +390,16 @@ def test_release_team_delegates_and_reads_changelog(monkeypatch):
                         },
                     )
                     if parent
-                    else ToolCallPart("read_changelog", {})
+                    else ToolCallPart("read_text_file", {"file_path": "CHANGELOG.md"})
                 ]
             )
         assert "account_id" in str(returns[-1].content)
         fields = (
-            {"announcement": "v2.0 adds CSV exports and renames an API field.", "steps": steps}
+            {"steps": steps}
             if parent
             else {
                 "task_summary": "Read v2.0 and identified the API migration.",
-                "final_result": {"changes": ["CSV exports"], "migration": steps},
+                "final_result": steps,
             }
         )
         return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, fields)])

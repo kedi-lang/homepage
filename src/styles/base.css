@@ -396,6 +396,10 @@ pre {
   color: #195237;
   background: #f1df8b80;
 }
+.movie-tool-source {
+  margin-top: 10px;
+  font-size: 12px;
+}
 .syntax-input {
   color: var(--red);
 }
@@ -478,9 +482,8 @@ dd {
 .is-playing .value-result {
   opacity: 0.22;
 }
-.code-window[data-step='context'] .code-line:first-child,
-.code-window[data-step='template'] .code-line:nth-child(2),
-.code-window[data-step='template'] .code-line:nth-child(3) {
+.code-window[data-step='context'] [data-replay-phase='context'],
+.code-window[data-step='template'] [data-replay-phase='template'] {
   background: #f2da8240;
 }
 .is-playing .replay-button svg {

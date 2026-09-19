@@ -54,17 +54,16 @@ artifact. Only the built `dist/` directory is a publishable website output.
 ## Scope
 
 - Istanbul hero with a separate interactive pixel cat.
-- A typed handoff, API migration check, grounded-copy loop, and a loop/map
+- A TMDB movie lookup, typed action, API migration check, grounded-copy loop, and a loop/map
   issue inbox. Python calculates a quote; a reusable procedure builds a handoff.
 - The stock tool reads `public/examples/inventory.json`. Place it in the
   program's cwd as `inventory.json` when running the displayed example.
 - A release-team example combining profiles, a file-reading tool, a typed
   subagent result, and template outputs. The fictional input changelog is in
   `public/examples/CHANGELOG.md`; the program reads `CHANGELOG.md` from its cwd.
-- Two Kedi + Jev tabs: a typed router combining `ChoiceCriteria`, `Rubric`, and
-  `Probability`, followed by an LLM draft/Jev review workflow with inspectable
-  decision evidence. Routing thresholds are illustrative application policy,
-  not calibration results.
+- One compact Kedi + Jev example: a `Literal` queue choice and a cancellation
+  `Probability` share one request. Python applies the priority rule locally.
+  The threshold is illustrative application policy, not a calibration result.
 - Kedi Harness teaser explicitly marked coming soon.
 - A local Notebook section with its real screenshot, `kedi notebook` launch
   command, source-checkout setup, and cell-to-cell state example.
@@ -76,6 +75,10 @@ All displayed outputs are curated **illustrative output**, not live model calls
 or measured recordings. Replay is visual playback only. There are no model
 latency, accuracy, or cost claims. The examples are stored in
 `src/data/examples.json`; rendered code and clipboard text share that source.
+Only the introductory movie example has explanatory comments. The hero imports the HTTPX-backed
+tool from `public/examples/tmdb.kedi`, linked beneath the example. This is a local
+example module, not a built-in Kedi package; it must sit alongside `movie_night.kedi`.
+The copy button copies the displayed main program.
 Real workflow recordings can replace this illustrative presentation later.
 
 The header, footer, and favicon use the supplied monochrome Kedi emblem.
@@ -86,12 +89,26 @@ Pause/Play. Reduced motion disables movement. Grooming/walking sprite animation
 is not implemented in this first prototype.
 
 The standalone snippets inherit the user's configured model. The release-team
-and Jev draft examples select `google/gemini-3-flash-preview` directly through
-Google, with `GOOGLE_API_KEY`; no OpenRouter routing is used. Both Jev examples
-require `kedi[typesafe]` and `TYPESAFE_API_KEY`. The router needs no generative
-model. These are local program prerequisites, not website secrets:
+example selects `google/gemini-3-flash-preview` directly through Google, with
+`GOOGLE_API_KEY`; no OpenRouter routing is used. The Jev example requires
+`kedi[typesafe]` and `TYPESAFE_API_KEY`, but no generative model.
+These are local program prerequisites, not website secrets:
 the static site never calls a model. Displayed decisions are illustrative, not
 measurements or guarantees of correctness.
+
+The movie example uses `httpx` and the official
+[TMDB movie details API](https://developer.themoviedb.org/reference/movie-details).
+Set `TMDB_API_KEY` to your TMDB API Read Access Token in the Kedi process's
+environment. The tool sends it as a Bearer header, requests credits alongside
+movie details, applies a 10-second HTTPX timeout, and checks HTTP status before
+decoding JSON. It first searches by the supplied film title, then retrieves
+details using the ID returned by TMDB. No ID is embedded in the program.
+Ambiguous results request a year or a more specific title rather than choosing
+an arbitrary match; `movie_details("Dune", 1984)` can distinguish remakes.
+No MCP server, Node.js, or
+localhost port is needed. No credential is embedded in the example or sent by
+the homepage. Tests run the actual tool with mocked HTTP responses, not live
+TMDB requests. The example allows its registered tool to execute automatically.
 
 ## Verification
 
@@ -117,9 +134,10 @@ python -m pytest website/tests/test_examples.py -q
 ```
 
 These check typed bindings, branching, loop/map behavior, real fixture reads,
-subagent delegation, Jev criteria transport, and threshold boundaries. They are
-integration checks, not live-model accuracy measurements. Tool examples explicitly
-allow their registered tools; review that policy before adapting them.
+subagent delegation, HTTP authentication, error handling and typed movie results, Jev criteria
+transport, and threshold boundaries. They are integration checks, not live-model
+accuracy measurements. The stock example explicitly allows its tools; the
+researcher uses a read-only file tool. Review tool permissions before adapting them.
 
 When developing inside the Kedi workspace, validate examples with the real parser:
 

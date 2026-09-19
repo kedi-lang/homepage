@@ -38,7 +38,7 @@ const { example, id, replay = false, compact = false } = Astro.props;
     role="region"
     aria-label={`${example.filename} source code`}
   >
-    <pre><code>{example.code.split('\n').map((line, index) => <span class="code-line"><span class="line-number" aria-hidden="true">{index + 1}</span><span class="line-source">{highlight(line).map(token => <span class={token.kind ? `syntax-${token.kind}` : undefined}>{token.text}</span>)}{!line && '\u00a0'}</span></span>)}</code></pre>
+    <pre><code>{example.code.split('\n').map((line, index) => <span class="code-line" data-replay-phase={line.trim().startsWith('>>') ? 'template' : line.trim().startsWith('> use:') ? 'context' : undefined}><span class="line-number" aria-hidden="true">{index + 1}</span><span class="line-source">{highlight(line).map(token => <span class={token.kind ? `syntax-${token.kind}` : undefined}>{token.text}</span>)}{!line && '\u00a0'}</span></span>)}</code></pre>
   </div>
   <textarea
     class="copy-source"

@@ -1,17 +1,22 @@
 {
   "hello": {
-    "filename": "handoff.kedi",
-    "code": "[note] = Mira owns checkout. Ship only after QA signs off.\n\n>> From <note>, the owner is [owner: str].\nShipping needs approval: [needs_approval: bool].\n\n= <owner>",
+    "filename": "movie_night.kedi",
+    "code": "# Load the movie lookup tool.\n> import: tmdb\n# Let the model use it.\n> approval: allow\n> use: movie_details\n\n# Find the film by name and capture its details.\n>> Look up Spirited Away using movie_details. Its director is [director: str], release year [year: int], and runtime [minutes: int] minutes.\n\n# Use the result as a program value.\n= <director>",
     "values": [
       {
-        "name": "owner",
+        "name": "director",
         "type": "str",
-        "value": "Mira"
+        "value": "Hayao Miyazaki"
       },
       {
-        "name": "needs_approval",
-        "type": "bool",
-        "value": "True"
+        "name": "year",
+        "type": "int",
+        "value": "2001"
+      },
+      {
+        "name": "minutes",
+        "type": "int",
+        "value": "125"
       }
     ]
   },
@@ -71,7 +76,7 @@
   },
   "python": {
     "filename": "quote.kedi",
-    "code": "[quote] = 12 seats at 19 dollars per month, billed yearly.\n\n>> In <quote>, there are [seats: int] seats at\n[monthly_usd: float] dollars per seat per month.\n\n[annual_usd: float] = `seats * monthly_usd * 12`\n= `annual_usd`",
+    "code": "[quote] = 12 seats at 19 dollars per month, billed yearly.\n\n>> In <quote>, there are [seats: int] seats at [monthly_usd: float] dollars per seat per month.\n\n[annual_usd: float] = `seats * monthly_usd * 12`\n= `annual_usd`",
     "values": [
       {
         "name": "seats",
@@ -108,7 +113,7 @@
   },
   "tool": {
     "filename": "stock_check.kedi",
-    "code": "```\nimport json\nfrom pathlib import Path\n```\n\n@stock(item: str) -> int:\n  = `json.loads(Path(\"inventory.json\").read_text())[item]`\n\n> approval: allow\n> use: stock\n>> Check stock for \"field-notebook\": [remaining: int].\nCan it fill an order of 4? [can_fulfill: bool].\n\n= `can_fulfill`",
+    "code": "```\nimport json\nfrom pathlib import Path\n```\n\n@stock(item: str) -> int:\n  = `json.loads(Path(\"inventory.json\").read_text())[item]`\n\n> approval: allow\n> use: stock\n>> Check stock for \"field-notebook\": [remaining: int]. Can it fill an order of 4? [can_fulfill: bool].\n\n= `can_fulfill`",
     "values": [
       {
         "name": "remaining",
@@ -124,13 +129,8 @@
   },
   "agent": {
     "filename": "release_team.kedi",
-    "code": "```\nfrom pathlib import Path\n```\n\n> adapter: pydantic\n> model: google/gemini-3-flash-preview\n\n@read_changelog() -> str:\n  = `Path(\"CHANGELOG.md\").read_text()`\n\n~Findings(changes: list[str], migration: list[str])\n\n> profile: researcher:\n  > approval: allow\n  > system: Read v2.0. Separate features from required migrations.\n  > use: read_changelog\n  > output: Findings\n\n> profile: editor:\n  > approval: allow\n  > system: Ask the researcher first. Keep every claim grounded.\n  > subagent: researcher\n  > max_agents: 2\n\n> use: editor\n>> Announce v2.0 in [announcement: str].\nGive existing users a migration checklist: [steps: list[str]].\n\n= `steps`",
+    "code": "> import: filesystem\n> model: google/gemini-3-flash-preview\n\n> profile: researcher:\n  > system: Read CHANGELOG.md. Find required v2.0 migrations.\n  > use: read_text_file\n  > output: list[str]\n\n> profile: editor:\n  > subagent: researcher\n\n> use: editor\n>> Ask the researcher for v2.0 migrations as a checklist: [steps: list[str]].\n\n= `steps`",
     "values": [
-      {
-        "name": "announcement",
-        "type": "str",
-        "value": "v2.0 adds CSV exports and renames an API field."
-      },
       {
         "name": "steps",
         "type": "list[str]",
@@ -139,49 +139,18 @@
     ]
   },
   "jev": {
-    "filename": "reply_review.kedi",
-    "code": "```\nfrom kedi import decision_info\n```\n\n> adapter: pydantic\n\n@draft_reply(ticket: str, policy: str) -> str:\n  > model: google/gemini-3-flash-preview\n  >> Reply to <ticket> using only <policy>: [reply: str]\n  = <reply>\n\n> model: typesafe/jev-latest\n> settings:\n  typesafe_threshold: 0.9\n\n[ticket] = My order never arrived. Can I get a refund?\n[policy] = Check delivery first. No refund has been approved.\n[draft] = <draft_reply(<ticket>, <policy>)>\n\n>> Given <policy>, the reply <draft> makes no unsupported promises: [approved: bool].\n[probability: float] = `decision_info(\"approved\").probability`\n\n[status] = needs review\n> if: `approved`:\n  [status] := ready for review\n\n= <status>",
+    "filename": "ticket_triage.kedi",
+    "code": "```\nfrom typing import Literal\nfrom kedi.typesafe import Probability\n```\n\n> model: typesafe/jev-latest\n[ticket] = I was charged twice. Reverse it or I cancel today.\n\n>> <ticket> belongs to [queue: Literal[\"billing\", \"technical\"]]. The probability the customer intends to cancel is [churn: Probability].\n\n= `{\"queue\": queue, \"priority\": churn >= 0.8}`",
     "values": [
       {
-        "name": "approved",
-        "type": "bool",
-        "value": "True"
-      },
-      {
-        "name": "probability",
-        "type": "float",
-        "value": "0.96"
-      },
-      {
-        "name": "status",
-        "type": "str",
-        "value": "ready for review"
-      }
-    ]
-  },
-  "jevRouting": {
-    "filename": "ticket_router.kedi",
-    "code": "```\nfrom typing import Annotated, Literal\nfrom kedi.typesafe import (\n    BooleanCriteria, ChoiceCriteria, Probability, Rubric,\n)\n\nQueue = Annotated[\n    Literal[\"billing\", \"technical\"],\n    ChoiceCriteria({\n        \"billing\": \"Payments, refunds, and invoices\",\n        \"technical\": \"Broken software or access\",\n    }),\n]\nUrgency = Annotated[\n    float,\n    Rubric([\"Routine\", \"Time-sensitive\", \"Blocked now\"]),\n]\nChurn = Annotated[\n    Probability,\n    BooleanCriteria(\n        true=\"The customer intends to cancel their subscription\",\n        false=\"The customer plans to stay or has no cancellation intent\",\n    ),\n]\n```\n\n> adapter: pydantic\n> model: typesafe/jev-latest\n\n~Triage(\n  queue: `Queue`,\n  urgency: `Urgency`,\n  churn: `Churn`\n)\n\n[ticket] = I was charged twice. Reverse it or I cancel today.\n>> Route and assess <ticket>: [triage: Triage].\n\n[route] = `f\"{triage.queue}/standard\"`\n> if: `triage.urgency >= 1.5 or triage.churn >= 0.8`:\n  [route] := `f\"{triage.queue}/priority\"`\n\n= <route>",
-    "values": [
-      {
-        "name": "triage.queue",
-        "type": "Queue",
+        "name": "queue",
+        "type": "Literal",
         "value": "billing"
       },
       {
-        "name": "triage.urgency",
-        "type": "float",
-        "value": "1.6"
-      },
-      {
-        "name": "triage.churn",
+        "name": "churn",
         "type": "Probability",
         "value": "0.93"
-      },
-      {
-        "name": "route",
-        "type": "str",
-        "value": "billing/priority"
       }
     ]
   }

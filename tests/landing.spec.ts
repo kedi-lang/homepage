@@ -10,6 +10,47 @@ test('social covers are excluded from the publishable output', () => {
   ).toEqual([]);
 });
 
+test('movie example explains its statements and replays the template, not a comment', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const hero = page.locator('[data-demo="hero"]');
+  await expect(hero.locator('.syntax-comment')).toHaveCount(4);
+  await expect(hero.locator('.copy-source')).toHaveValue(examples.hello.code);
+  await expect(hero.locator('details')).toHaveCount(0);
+  await expect(hero.locator('.code-body')).toContainText('> import: tmdb');
+  await expect(hero.locator('.code-body')).toContainText(
+    '> use: movie_details',
+  );
+  await expect(hero.locator('.code-body')).not.toContainText('> mcp:');
+  await expect(hero.locator('.value-result')).toHaveText([
+    'Hayao Miyazaki',
+    '2001',
+    '125',
+  ]);
+  const template = hero.locator('[data-replay-phase="template"]');
+  await expect(template).toContainText('>> Look up Spirited Away');
+  expect(examples.hello.code.split('\n').length).toBeLessThanOrEqual(12);
+  await expect(page.locator('.movie-tool-source')).toHaveAttribute(
+    'href',
+    '/examples/tmdb.kedi',
+  );
+  const source = await page.request.get('/examples/tmdb.kedi');
+  expect(source.ok()).toBe(true);
+  expect(await source.text()).toContain(
+    'client.get("search/movie", params=params)',
+  );
+  await expect(template.locator('.syntax-comment')).toHaveCount(0);
+  await hero
+    .getByRole('button', { name: 'Replay movie_night.kedi example' })
+    .click();
+  await expect(hero).toHaveAttribute('data-step', 'template');
+  await expect(template).toHaveCSS(
+    'background-color',
+    'rgba(242, 218, 130, 0.25)',
+  );
+});
+
 test('brand mark has transparent negative space and an uncropped border', async () => {
   const { data, info } = await sharp('public/assets/kedi-logo.webp')
     .ensureAlpha()
@@ -86,34 +127,22 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     await expect(page.locator('[data-demo="agent"]')).toContainText(
       '> subagent: researcher',
     );
-    await expect(
-      page.getByRole('tab', { name: 'Assess & route' }),
-    ).toHaveAttribute('aria-selected', 'true');
-    await expect(page.locator('[data-demo="jev-routing"]')).toContainText(
-      'ChoiceCriteria',
-    );
-    await page.getByRole('tab', { name: 'Draft & review' }).click();
     await expect(page.locator('[data-demo="jev"]')).toBeVisible();
     await expect(page.locator('[data-demo="jev"]')).toContainText(
-      'typesafe_threshold: 0.9',
+      'typesafe/jev-latest',
     );
     await expect(page.locator('[data-demo="jev"]')).toContainText(
-      'google/gemini-3-flash-preview',
+      'churn >= 0.8',
     );
-    await page.getByRole('tab', { name: 'Assess & route' }).click();
-    await expect(page.locator('[data-demo="jev"]')).toBeHidden();
     await expect(page.locator('.jev-primitives dt')).toHaveText([
-      'Score',
       'Choice',
       'Probability',
-      'Criteria',
     ]);
-    await expect(page.locator('.jev-primitives')).toContainText(
-      'Add ChoiceCriteria',
-    );
-    await expect(page.locator('.jev-primitives')).toContainText(
-      'Use BooleanCriteria',
-    );
+    await expect(page.locator('#jev [role="tab"]')).toHaveCount(0);
+    expect(examples.jev.code.split('\n').length).toBeLessThanOrEqual(12);
+    await expect(
+      page.locator('.code-window:not([data-demo="hero"]) .syntax-comment'),
+    ).toHaveCount(0);
     await expect(
       page.getByRole('link', { name: 'Explore the Jev integration' }),
     ).toHaveAttribute(
@@ -197,11 +226,6 @@ for (const width of [320, 390, 768, 1440, 1920]) {
           animations: 'disabled',
         });
       }
-      await page.getByRole('tab', { name: 'Draft & review' }).click();
-      await page.locator('#jev').screenshot({
-        path: testInfo.outputPath(`jev-review-${width}.png`),
-        animations: 'disabled',
-      });
     }
   });
 }
@@ -250,26 +274,18 @@ test('tabs, keyboard navigation, clipboard, and replay', async ({
     'pip install kedi',
   );
   await page
-    .getByRole('button', { name: 'Replay handoff.kedi example' })
+    .getByRole('button', { name: 'Replay movie_night.kedi example' })
     .click();
   await expect(
-    page.getByRole('button', { name: 'Replay handoff.kedi example' }),
+    page.getByRole('button', { name: 'Replay movie_night.kedi example' }),
   ).toBeEnabled();
   await expect(page.locator('[data-demo="hero"]')).not.toHaveAttribute(
     'aria-busy',
   );
   await expect(
     page.locator('[data-demo="hero"] .value-result').first(),
-  ).toHaveText('Mira');
+  ).toHaveText('Hayao Miyazaki');
   await expect(page.locator('.cat-button')).toHaveCSS('animation-name', 'none');
-  await page.getByRole('tab', { name: 'Assess & route' }).click();
-  await page.getByRole('button', { name: 'Copy ticket_router.kedi' }).click();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    examples.jevRouting.code,
-  );
-  await page.getByRole('tab', { name: 'Draft & review' }).press('ArrowLeft');
-  await expect(page.getByRole('tab', { name: 'Assess & route' })).toBeFocused();
-  await page.getByRole('tab', { name: 'Draft & review' }).click();
   for (const key of ['agent', 'jev'] as const) {
     await page
       .getByRole('button', { name: `Copy ${examples[key].filename}` })
@@ -437,10 +453,10 @@ test('source remains readable without JavaScript', async ({
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('[data-demo="hero"]')).toContainText(
-    'Shipping needs approval',
+    'Spirited Away',
   );
   await expect(
     page.locator('[data-demo="hero"] .value-result').first(),
-  ).toHaveText('Mira');
+  ).toHaveText('Hayao Miyazaki');
   await context.close();
 });
