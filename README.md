@@ -31,6 +31,8 @@ The **Documentation** workflow in `kedi-lang/kedi-docs` owns the single Pages
 publication. It checks out an exact homepage commit, builds and tests both sites,
 then publishes them together. Do not deploy this repository's `dist/` directly
 over the documentation or configure a second custom domain here.
+The **Homepage** workflow runs Astro and Playwright checks on pushes and pull
+requests; this repository's standalone GitHub Pages/Jekyll publisher is disabled.
 
 Homepage `main` is checked approximately every 15 minutes (GitHub Actions
 schedules can be delayed). Unchanged revisions do not trigger another build.

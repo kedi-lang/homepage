@@ -48,7 +48,11 @@ try {
   }
   const failedAssets = [];
   page.on('response', (response) => {
-    if (response.status() >= 400 && response.url().startsWith(base))
+    if (
+      response.status() >= 400 &&
+      (response.url().startsWith(base) ||
+        response.url().startsWith('https://kedi-lang.org/'))
+    )
       failedAssets.push(response.url());
   });
   await page.goto(base, { waitUntil: 'networkidle' });
