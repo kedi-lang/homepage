@@ -39,6 +39,10 @@
   object-fit: contain;
   image-rendering: pixelated;
 }
+.team-yigit img {
+  /* Match the visible portrait height, accounting for different transparent margins. */
+  transform: scale(0.89);
+}
 .team-details {
   min-width: 0;
 }

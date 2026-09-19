@@ -55,7 +55,8 @@ background scene, labels, or border.
 `team-mert.png` and `team-yigit.png` are generated front-facing pixel portraits,
 without glasses or accessories. Mert's white and brown tabby markings reference
 a user-provided photograph; that private photograph is not included here.
-Yigit's portrait depicts a white Turkish Angora with blue eyes. Both use the
+Yigit's portrait depicts an adult male white Turkish Angora with blue eyes,
+a broader muzzle, fuller cheeks, and relaxed smaller eyes. Both use the
 same coarse pixel style, upright framing and transparent square canvas.
 Their web copies are 256px lossless WebP,
 resized with nearest-neighbor sampling to preserve the pixel edges.

@@ -294,7 +294,11 @@ test('team profiles have distinct avatars and accessible social links', async ({
     team.getByRole('heading', { name: 'Doğukan Yiğit Polat' }),
   ).toBeVisible();
   await expect(team).toContainText('Applied AI Engineer');
-  await expect(team).toContainText('PhD at NUS');
+  await expect(team).toContainText('PhD Student');
+  await expect(team.locator('.team-role span:first-child')).toHaveText([
+    'Co-creator',
+    'Co-creator',
+  ]);
   const links = team.getByRole('link');
   await expect(links).toHaveCount(4);
   const expected = [
