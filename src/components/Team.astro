@@ -1,0 +1,87 @@
+---
+import { faLinkedinIn, faXTwitter } from '@fortawesome/free-brands-svg-icons';
+
+const founders = [
+  {
+    name: 'Mert Sırakaya',
+    role: 'Applied AI Engineer',
+    avatar: 'team-mert',
+    alt: 'Front-facing pixel portrait of a white and brown tabby cat',
+    x: 'un3valuated',
+    linkedin: 'mert-sirakaya',
+  },
+  {
+    name: 'Doğukan Yiğit Polat',
+    role: 'PhD at NUS',
+    avatar: 'team-yigit',
+    alt: 'Front-facing pixel portrait of a white Ankara cat with blue eyes',
+    x: 'dyigitpolat',
+    linkedin: 'dyigitpolat',
+  },
+];
+---
+
+<section id="team" class="section team-section" aria-labelledby="team-title">
+  <div class="container">
+    <span class="section-kicker">07 / THE TEAM</span>
+    <h2 id="team-title">The people behind Kedi.</h2>
+    <ul class="team-list">
+      {founders.map((founder) => (
+        <li class="team-member">
+          <div class:list={['team-avatar', founder.avatar]}>
+            <img
+              src={`/assets/${founder.avatar}.webp`}
+              alt={founder.alt}
+              width="256"
+              height="256"
+              loading="lazy"
+            />
+          </div>
+          <div class="team-details">
+            <h3>{founder.name}</h3>
+            <p class="team-role">
+              <span>Co-founder</span>
+              <span>{founder.role}</span>
+            </p>
+            <div class="team-socials">
+              {[
+                {
+                  label: 'X',
+                  href: `https://x.com/${founder.x}`,
+                  icon: faXTwitter,
+                },
+                {
+                  label: 'LinkedIn',
+                  href: `https://www.linkedin.com/in/${founder.linkedin}/`,
+                  icon: faLinkedinIn,
+                },
+              ].map(({ label, href, icon }) => (
+                <a
+                  class="icon-button"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${founder.name} on ${label} (opens in a new tab)`}
+                  data-tooltip={label}
+                >
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox={`0 0 ${icon.icon[0]} ${icon.icon[1]}`}
+                    fill="currentColor"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    {[icon.icon[4]].flat().map((path) => (
+                      <path d={path} />
+                    ))}
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

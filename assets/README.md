@@ -50,7 +50,17 @@ Turkish flag. A tiny tuxedo cat with yellow collar on the deck. Refined 1990s
 pixel style and restrained dither. Wide layout with a small pixel wake, no
 background scene, labels, or border.
 
-## Encoding
+## Team avatars
+
+`team-mert.png` and `team-yigit.png` are generated front-facing pixel portraits,
+without glasses or accessories. Mert's white and brown tabby markings reference
+a user-provided photograph; that private photograph is not included here.
+Yigit's portrait depicts a white Turkish Angora with blue eyes. Both use the
+same coarse pixel style, upright framing and transparent square canvas.
+Their web copies are 256px lossless WebP,
+resized with nearest-neighbor sampling to preserve the pixel edges.
+
+## Other assets and reproduction
 
 The notebook screenshot at `public/assets/kedi-notebook.png` is an unmodified
 copy of `notebook/.github/assets/kedi-notebook.png`, the real product screenshot

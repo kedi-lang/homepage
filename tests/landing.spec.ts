@@ -63,6 +63,14 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     await expect(page.locator('#agents-title')).toBeVisible();
     await expect(page.locator('#jev-title')).toBeVisible();
     await expect(page.locator('#notebook-title')).toBeVisible();
+    for (const member of await page.locator('.team-member').all()) {
+      const avatar = await member.locator('.team-avatar').boundingBox();
+      const details = await member.locator('.team-details').boundingBox();
+      expect(avatar).not.toBeNull();
+      expect(details).not.toBeNull();
+      expect(Math.abs(avatar!.y - details!.y)).toBeLessThanOrEqual(1);
+      expect(details!.x).toBeGreaterThan(avatar!.x + avatar!.width);
+    }
     await expect(
       page.locator('.site-footer a[href="https://discord.gg/cuSbZd5he"]'),
     ).toHaveText(/Discord/);
@@ -183,7 +191,7 @@ for (const width of [320, 390, 768, 1440, 1920]) {
       animations: 'disabled',
     });
     if (width === 390 || width === 1440) {
-      for (const section of ['agents', 'jev', 'notebook']) {
+      for (const section of ['agents', 'jev', 'notebook', 'team']) {
         await page.locator(`#${section}`).screenshot({
           path: testInfo.outputPath(`${section}-${width}.png`),
           animations: 'disabled',
@@ -272,6 +280,59 @@ test('tabs, keyboard navigation, clipboard, and replay', async ({
   }
 });
 
+test('team profiles have distinct avatars and accessible social links', async ({
+  page,
+}) => {
+  await page.goto('/#team');
+  const team = page.locator('#team');
+  await expect(page.locator('#harness + #team')).toHaveCount(1);
+  await expect(page.locator('#team + #start:last-child')).toHaveCount(1);
+  await expect(
+    team.getByRole('heading', { name: 'Mert Sırakaya' }),
+  ).toBeVisible();
+  await expect(
+    team.getByRole('heading', { name: 'Doğukan Yiğit Polat' }),
+  ).toBeVisible();
+  await expect(team).toContainText('Applied AI Engineer');
+  await expect(team).toContainText('PhD at NUS');
+  const links = team.getByRole('link');
+  await expect(links).toHaveCount(4);
+  const expected = [
+    ['Mert Sırakaya', 'X', 'https://x.com/un3valuated'],
+    ['Mert Sırakaya', 'LinkedIn', 'https://www.linkedin.com/in/mert-sirakaya/'],
+    ['Doğukan Yiğit Polat', 'X', 'https://x.com/dyigitpolat'],
+    [
+      'Doğukan Yiğit Polat',
+      'LinkedIn',
+      'https://www.linkedin.com/in/dyigitpolat/',
+    ],
+  ];
+  for (const [name, network, href] of expected) {
+    const link = team.getByRole('link', {
+      name: `${name} on ${network} (opens in a new tab)`,
+      exact: true,
+    });
+    await expect(link).toHaveAttribute('href', href);
+    await expect(link.locator('svg')).toHaveCount(1);
+    await link.focus();
+    await expect(link).toBeFocused();
+    await expect
+      .poll(() =>
+        link.evaluate(
+          (element) => getComputedStyle(element, '::after').opacity,
+        ),
+      )
+      .toBe('1');
+  }
+  for (const name of ['team-mert', 'team-yigit']) {
+    const metadata = await sharp(`public/assets/${name}.webp`).metadata();
+    expect(metadata.width).toBe(256);
+    expect(metadata.height).toBe(256);
+    expect(metadata.hasAlpha).toBe(true);
+    await expect(team.locator(`img[src="/assets/${name}.webp"]`)).toBeVisible();
+  }
+});
+
 test('notebook launch and setup commands are copyable', async ({
   page,
   context,
@@ -303,10 +364,7 @@ test('notebook launch and setup commands are copyable', async ({
   ).toHaveAttribute('href', '/assets/kedi-notebook.png');
   await expect(
     page.getByRole('link', { name: 'Notebook setup guide' }),
-  ).toHaveAttribute(
-    'href',
-    'https://kedi-lang.org/docs/tooling/notebook/',
-  );
+  ).toHaveAttribute('href', 'https://kedi-lang.org/docs/tooling/notebook/');
 });
 
 test('mobile menu opens, closes on navigation, and supports Escape', async ({

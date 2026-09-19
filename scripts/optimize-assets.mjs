@@ -39,3 +39,14 @@ await sharp('assets/source/kedi-logo.png')
   .resize(64, 64, { fit: 'contain', background: '#f5f6f2' })
   .webp({ lossless: true })
   .toFile('public/assets/kedi-favicon.webp');
+
+for (const name of ['team-mert', 'team-yigit']) {
+  await sharp(`assets/source/${name}.png`)
+    .resize(256, 256, {
+      fit: 'contain',
+      background: '#00000000',
+      kernel: 'nearest',
+    })
+    .webp({ lossless: true })
+    .toFile(`public/assets/${name}.webp`);
+}
