@@ -1,0 +1,121 @@
+---
+import { ArrowRight, Copy, Check, Expand } from '@lucide/astro';
+
+const guide = 'https://kedi-lang.org/docs/tooling/notebook/';
+---
+
+<section
+  id="notebook"
+  class="section notebook-section"
+  aria-labelledby="notebook-title"
+>
+  <div class="container">
+    <div class="section-kicker">
+      <span>06 / KEDI NOTEBOOK</span>
+      <span class="side-note">A LITTLE ROOM TO EXPERIMENT.</span>
+    </div>
+    <div class="notebook-intro">
+      <div>
+        <h2 id="notebook-title">One cell leads to another.</h2>
+        <p class="section-intro">
+          Try a template. Inspect its values. Keep going in the next cell, with
+          your program's state right where you left it.
+        </p>
+      </div>
+      <div class="notebook-launch">
+        <div class="install-command">
+          <span class="shell-prefix" aria-hidden="true">
+            $
+          </span>
+          <code>kedi notebook</code>
+          <button
+            type="button"
+            class="icon-button"
+            data-copy-command
+            aria-label="Copy notebook command"
+            data-tooltip="Copy command"
+          >
+            <Copy size={17} class="copy-icon" />
+            <Check size={17} class="copied-icon" />
+          </button>
+        </div>
+        <p class="notebook-launch-note">
+          Opens your browser at <code>localhost:8788/notebook/</code>. Served
+          locally, on your machine.
+        </p>
+        <details class="notebook-setup">
+          <summary>First-time setup</summary>
+          <p>
+            From a Kedi source checkout with its submodules initialized, install
+            the notebook dependencies and launch it with:
+          </p>
+          <div class="install-command">
+            <code>uv run --extra notebook kedi notebook</code>
+            <button
+              type="button"
+              class="icon-button"
+              data-copy-command
+              aria-label="Copy notebook setup command"
+              data-tooltip="Copy command"
+            >
+              <Copy size={17} class="copy-icon" />
+              <Check size={17} class="copied-icon" />
+            </button>
+          </div>
+          <p>
+            After installation, run <code>kedi notebook</code> with that
+            environment active.
+          </p>
+        </details>
+      </div>
+    </div>
+    <figure class="notebook-preview">
+      <a
+        href="/assets/kedi-notebook.png"
+        target="_blank"
+        rel="noopener"
+        aria-label="View full-size Kedi Notebook screenshot"
+      >
+        <img
+          src="/assets/kedi-notebook.png"
+          width="2048"
+          height="689"
+          alt="Kedi Notebook: the first cell binds city from a template; the second cell reads city and displays Ankara."
+          loading="lazy"
+        />
+        <span class="notebook-expand">
+          <Expand size={16} /> View full size
+        </span>
+      </a>
+      <figcaption>
+        <span>
+          <strong>[1]</strong> A template produces <code>city</code>.
+        </span>
+        <span>
+          <strong>[2]</strong> <code>= &lt;city&gt;</code> reads it in the next
+          cell.
+        </span>
+      </figcaption>
+    </figure>
+    <div class="notebook-details">
+      <div>
+        <h3>Your Python, your choice.</h3>
+        <p>
+          Start with browser Python, or select a host interpreter with a
+          reusable notebook virtual environment.
+        </p>
+      </div>
+      <div>
+        <h3>More than a scratchpad.</h3>
+        <p>
+          Mix Kedi, Markdown, and terminal cells. Save a <code>.kedinb</code>{' '}
+          notebook, with optional execution progress and no Secret Manager
+          values.
+        </p>
+      </div>
+      <a class="text-link" href={guide}>
+        Notebook setup guide <ArrowRight size={17} />
+      </a>
+    </div>
+  </div>
+</section>

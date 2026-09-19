@@ -1,0 +1,18 @@
+---
+interface Props {
+  showName?: boolean;
+}
+
+const { showName = true } = Astro.props;
+---
+
+<a class="brand" href="#" aria-label="Kedi home">
+  <img
+    class="brand-logo"
+    src="/assets/kedi-logo.webp"
+    width="64"
+    height="44"
+    alt=""
+  />
+  {showName && <span>Kedi</span>}
+</a>

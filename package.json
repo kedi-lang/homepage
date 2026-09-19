@@ -1,0 +1,31 @@
+{
+  "name": "kedi-homepage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 127.0.0.1",
+    "build": "astro check && astro build",
+    "preview": "astro preview --host 127.0.0.1",
+    "test": "npm run build && playwright test",
+    "format": "prettier --write .",
+    "assets": "node scripts/optimize-assets.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "5.3.0",
+    "@fontsource-variable/geist-mono": "5.3.0",
+    "@lucide/astro": "1.47.0",
+    "astro": "7.3.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@playwright/test": "1.63.0",
+    "prettier": "3.9.8",
+    "prettier-plugin-astro": "1.0.1",
+    "sharp": "0.35.4",
+    "typescript": "6.0.3"
+  }
+}

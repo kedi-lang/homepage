@@ -1,0 +1,530 @@
+@media (max-width: 1199px) {
+  .brand-note {
+    display: none;
+  }
+  .hero-content {
+    width: min(750px, calc(100% - 120px));
+  }
+  .cat-button {
+    width: 85px;
+    right: -87px;
+    bottom: -55px;
+  }
+  .hero-statement {
+    font-size: 25px;
+  }
+  .language-example {
+    gap: 40px;
+  }
+  .example-layout,
+  .composition-panel {
+    gap: 32px;
+  }
+}
+@media (max-width: 900px) {
+  .container {
+    width: calc(100% - 48px);
+  }
+  .header-inner {
+    width: calc(100% - 40px);
+    min-height: 74px;
+  }
+  .brand {
+    font-size: 30px;
+  }
+  .brand-logo {
+    width: 60px;
+    height: 42px;
+  }
+  .site-header nav {
+    gap: 17px;
+    font-size: 12px;
+  }
+  .site-header nav .button {
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+  .hero-content {
+    width: calc(100% - 64px);
+  }
+  .cat-button {
+    width: 69px;
+    right: -24px;
+    bottom: -89px;
+  }
+  .hero h1 {
+    font-size: 106px;
+  }
+  .hero {
+    min-height: 0;
+  }
+  .hero-landscape {
+    object-position: 45% bottom;
+  }
+  .hero-content {
+    padding-bottom: 80px;
+  }
+  .hero .install {
+    padding-right: 30px;
+  }
+  h2 {
+    font-size: 38px;
+  }
+  .section {
+    padding-block: 66px;
+  }
+  .side-note {
+    display: none;
+  }
+  .section-heading-row {
+    display: block;
+  }
+  .section-heading-row > p {
+    margin-top: 20px;
+    max-width: none;
+  }
+  .anatomy-grid {
+    gap: 20px;
+  }
+  .anatomy-grid > div {
+    grid-template-columns: 1fr;
+  }
+  .anatomy-grid p {
+    grid-column: 1;
+  }
+  .sentence-example {
+    font-size: 20px;
+  }
+  .example-layout,
+  .composition-panel {
+    grid-template-columns: minmax(0, 1.8fr) minmax(190px, 1fr);
+    gap: 24px;
+  }
+  .claim-text {
+    font-size: 22px;
+  }
+  .composition-note h3,
+  .section-aside h3 {
+    font-size: 25px;
+  }
+  .harness-layout {
+    gap: 24px;
+    grid-template-columns: 1fr 1fr;
+  }
+  .harness-statement {
+    font-size: 38px;
+  }
+  .start-section {
+    padding-bottom: 0;
+  }
+}
+@media (max-width: 680px) {
+  html {
+    scroll-padding-top: 30px;
+  }
+  .container {
+    width: calc(100% - 36px);
+  }
+  .header-inner {
+    min-height: 66px;
+    width: calc(100% - 36px);
+  }
+  .brand {
+    font-size: 28px;
+    gap: 10px;
+  }
+  .brand-logo {
+    width: 56px;
+    height: 38px;
+  }
+  .menu-toggle {
+    display: inline-flex;
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+  }
+  .menu-close-icon {
+    display: none;
+  }
+  .site-header nav {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    background: var(--paper);
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 10px 20px #20322712;
+    margin: 0;
+    font-size: 15px;
+  }
+  .nav-open .site-header nav {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .nav-open .menu-open-icon {
+    display: none;
+  }
+  .nav-open .menu-close-icon {
+    display: block;
+  }
+  .site-header nav .button {
+    margin-top: 6px;
+    font-size: 14px;
+  }
+  .hero {
+    min-height: 0;
+  }
+  .hero-content {
+    width: calc(100% - 36px);
+    padding: 25px 0 43px;
+  }
+  .hero h1 {
+    font-size: 76px;
+    margin-top: 10px;
+  }
+  .hero-statement {
+    font-size: 23px;
+    max-width: 340px;
+    margin: 11px auto 0;
+    line-height: 1.23;
+  }
+  .hero-description {
+    font-size: 14px;
+    margin: 13px auto 0;
+    max-width: 270px;
+  }
+  .hero-demo {
+    margin-top: 23px;
+  }
+  .hero-landscape {
+    object-position: 42% bottom;
+  }
+  .hero-eyebrow {
+    font-size: 9px;
+  }
+  .cat-button {
+    width: 62px;
+    right: -5px;
+    bottom: -80px;
+  }
+  pre {
+    font-size: 11px;
+    line-height: 1.85;
+    padding: 15px 10px 16px 0;
+  }
+  .code-line {
+    min-height: 21px;
+  }
+  .line-number {
+    flex-basis: 30px;
+    width: 30px;
+    padding-right: 8px;
+    font-size: 10px;
+  }
+  .window-title {
+    font-size: 11px;
+  }
+  .code-window {
+    padding: 4px;
+    box-shadow:
+      inset 1px 1px 0 #fff,
+      inset -1px -1px 0 #919a92,
+      3px 3px 0 #20322715;
+  }
+  .result-header {
+    font-size: 9px;
+    padding-inline: 10px;
+  }
+  .example-label {
+    font-size: 9px;
+  }
+  .result-body {
+    display: block;
+    padding: 10px;
+  }
+  .value-list {
+    font-size: 10px;
+  }
+  .value-row {
+    grid-template-columns: minmax(72px, 1fr) minmax(31px, max-content) minmax(
+        70px,
+        1.35fr
+      );
+    gap: 7px;
+  }
+  .replay-button {
+    margin-top: 5px;
+    margin-left: auto;
+    padding-left: 0;
+    font-size: 10px;
+  }
+  .hero .install {
+    margin-top: 23px;
+    justify-content: flex-start;
+    padding-right: 63px;
+  }
+  .install-caption {
+    display: none;
+  }
+  .install-command {
+    gap: 10px;
+    padding-left: 10px;
+  }
+  .install-command code {
+    font-size: 13px;
+  }
+  .install-command .icon-button {
+    margin-left: 10px;
+  }
+  .location-note {
+    font-size: 8px;
+    bottom: 8px;
+    left: 12px;
+  }
+  h2 {
+    font-size: 31px;
+    line-height: 1.15;
+  }
+  .section {
+    padding-block: 49px;
+  }
+  .language-section {
+    padding-top: 26px;
+  }
+  .section-kicker {
+    margin-bottom: 18px;
+    font-size: 9px;
+  }
+  .section-intro {
+    font-size: 16px;
+    margin-top: 15px;
+  }
+  .desktop-break {
+    display: none;
+  }
+  .sentence-example {
+    font-size: 17px;
+    margin-top: 26px;
+    padding-block: 20px;
+  }
+  .anatomy-grid {
+    grid-template-columns: 1fr;
+    margin-block: 24px 38px;
+    gap: 22px;
+  }
+  .anatomy-grid > div {
+    grid-template-columns: 26px 1fr;
+    gap: 5px 10px;
+  }
+  .anatomy-grid p {
+    grid-column: 2;
+    max-width: 310px;
+  }
+  .anatomy-grid h3 {
+    font-size: 17px;
+  }
+  .language-example {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+  .section-aside h3 {
+    font-size: 27px;
+  }
+  .section-aside p {
+    max-width: 100%;
+    font-size: 15px;
+  }
+  .section-aside h3 br {
+    display: none;
+  }
+  .section-heading-row > p {
+    font-size: 15px;
+  }
+  .example-layout,
+  .composition-panel {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    gap: 28px;
+  }
+  .flow-aside {
+    min-width: 0;
+    padding-inline: 0;
+  }
+  .claim-text {
+    font-size: 23px;
+  }
+  .claim-text br {
+    display: none;
+  }
+  .branch-diagram {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+  }
+  .branch {
+    gap: 10px;
+    font-size: 12px;
+  }
+  .branch-state {
+    width: auto;
+  }
+  .tab-list {
+    gap: 3px;
+  }
+  .tab-list button {
+    font-size: 12px;
+    padding: 10px 13px;
+  }
+  .tabs {
+    margin-top: 25px;
+  }
+  .composition-note {
+    padding-left: 36px;
+    position: relative;
+  }
+  .composition-note > svg {
+    position: absolute;
+    left: 0;
+    top: 3px;
+    width: 22px;
+  }
+  .composition-note h3 {
+    font-size: 23px;
+  }
+  .composition-note h3 br {
+    display: none;
+  }
+  .composition-note p {
+    max-width: 100%;
+    margin-top: 12px;
+  }
+  .capability-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 19px 10px;
+    font-size: 10px;
+  }
+  .capability-strip > span {
+    gap: 6px;
+  }
+  .harness-layout {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .harness-statement {
+    font-size: 39px;
+  }
+  .harness-copy h2 {
+    margin-top: 20px;
+  }
+  .harness-art {
+    max-width: 450px;
+    margin-inline: auto;
+  }
+  .harness-art figcaption {
+    font-size: 8px;
+  }
+  .start-section {
+    padding-bottom: 0;
+  }
+  .start-content > p {
+    font-size: 16px;
+  }
+  .start-content h2 {
+    font-size: 30px;
+  }
+  .install-full {
+    max-width: 330px;
+  }
+  .install-full .install-command code {
+    font-size: 15px;
+  }
+  .install-full .icon-button {
+    margin-left: auto;
+  }
+  .start-links {
+    flex-direction: column;
+    gap: 13px;
+  }
+  .ferry-scene {
+    height: 160px;
+    margin-top: 17px;
+  }
+  .ferry {
+    width: 220px;
+    max-width: 60%;
+    left: 8%;
+    bottom: 31px;
+    animation-name: sailing-mobile;
+  }
+  @keyframes sailing-mobile {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(65px) translateY(2px);
+    }
+  }
+  .shore-label {
+    font-size: 8px;
+    bottom: 13px;
+  }
+  .shore-left {
+    left: 18px;
+  }
+  .shore-right {
+    right: 55px;
+  }
+  .motion-toggle {
+    right: 9px;
+    bottom: 7px;
+  }
+  .site-footer {
+    padding-block: 28px;
+  }
+  .footer-inner {
+    gap: 22px;
+  }
+  .site-footer p {
+    font-size: 10px;
+    flex: 1;
+    min-width: 150px;
+  }
+  .site-footer .brand {
+    font-size: 23px;
+  }
+  .site-footer .brand-logo {
+    width: 44px;
+    height: 30px;
+  }
+  .site-footer nav {
+    margin-left: 0;
+    gap: 24px;
+    width: 100%;
+  }
+  .footer-copyright {
+    padding-top: 17px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cat-button:hover,
+  .cat-button:focus-visible {
+    transform: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .motion-toggle {
+    display: none;
+  }
+}

@@ -1,0 +1,165 @@
+---
+import {
+  ArrowRight,
+  ArrowUpRight,
+  SlidersHorizontal,
+  ScanSearch,
+} from '@lucide/astro';
+import CodeWindow from './CodeWindow.astro';
+import Tabs from './Tabs.astro';
+import examples from '../data/examples.json';
+
+const guide = 'https://kedi-lang.org/docs/agent-adapters/typesafe/';
+---
+
+<section id="jev" class="section jev-section" aria-labelledby="jev-title">
+  <div class="container">
+    <div class="section-kicker">
+      <span>05 / KEDI + JEV</span>
+      <a class="jev-maker" href="https://typesafe.ai/">
+        JEV BY TYPESAFE <ArrowUpRight size={13} />
+      </a>
+    </div>
+    <h2 id="jev-title">
+      Typed judgments.
+      <br />
+      Your next move.
+    </h2>
+    <p class="section-intro">
+      Choose a route, score urgency, or assess a draft. Jev returns typed
+      judgments; your Kedi program decides what happens next.
+    </p>
+    <dl class="jev-primitives" aria-label="Jev primitives in Kedi">
+      <div>
+        <dt>Score</dt>
+        <dd>
+          Grade against your own <code>Rubric</code>. Describe the ordered
+          levels; receive a numeric score, not a paragraph to parse.
+        </dd>
+      </div>
+      <div>
+        <dt>Choice</dt>
+        <dd>
+          Select from <code>Literal</code> or enum options. Add{' '}
+          <code>ChoiceCriteria</code> to define what each option means.
+        </dd>
+      </div>
+      <div>
+        <dt>Probability</dt>
+        <dd>
+          Keep the raw assessment as a <code>Probability</code>, a float between
+          0 and 1. Your program decides how to act on it.
+        </dd>
+      </div>
+      <div>
+        <dt>Criteria</dt>
+        <dd>
+          State what to evaluate in <code>Annotated</code>. Use{' '}
+          <code>BooleanCriteria</code> to describe positive and negative
+          evidence.
+        </dd>
+      </div>
+    </dl>
+    <Tabs
+      id="jev-examples"
+      label="Jev workflow examples"
+      tabs={[
+        { id: 'routing', label: 'Assess & route' },
+        { id: 'review', label: 'Draft & review' },
+      ]}
+    >
+      <div
+        id="jev-examples-panel-routing"
+        role="tabpanel"
+        aria-labelledby="jev-examples-tab-routing"
+        class="showcase-layout"
+        data-panel="routing"
+      >
+        <CodeWindow example={examples.jevRouting} id="jev-routing" />
+        <aside
+          class="showcase-aside jev-aside"
+          aria-label="Typed ticket routing"
+        >
+          <div class="decision-rule">
+            <span class="tiny-label">AN ASSESSMENT THAT GOES SOMEWHERE</span>
+            <p>
+              <span>billing / priority</span>
+            </p>
+            <span class="decision-caption">
+              A finite queue, a rubric score, and a raw probability become a
+              routing decision.
+            </span>
+          </div>
+          <div class="jev-detail">
+            <SlidersHorizontal size={21} aria-hidden="true" />
+            <h3>Define what matters.</h3>
+            <p>
+              <code>ChoiceCriteria</code> describes the queues.{' '}
+              <code>Rubric</code> defines three urgency levels, scored from 0 to
+              2. <code>Probability</code> retains the cancellation assessment.
+            </p>
+          </div>
+          <div class="jev-detail">
+            <ScanSearch size={21} aria-hidden="true" />
+            <h3>Make the rule explicit.</h3>
+            <p>
+              All three fields share one Jev request. The Python condition
+              selects the priority lane locally, without another model call.
+            </p>
+          </div>
+          <p class="aside-caption">
+            Illustrative scores and example routing thresholds, not measured
+            accuracy or a calibrated policy.
+          </p>
+        </aside>
+      </div>
+      <div
+        id="jev-examples-panel-review"
+        role="tabpanel"
+        aria-labelledby="jev-examples-tab-review"
+        class="showcase-layout"
+        data-panel="review"
+        hidden
+      >
+        <CodeWindow example={examples.jev} id="jev" />
+        <aside
+          class="showcase-aside jev-aside"
+          aria-label="Jev decisions in Kedi"
+        >
+          <div class="decision-rule">
+            <span class="tiny-label">YOUR POLICY, IN CODE</span>
+            <p>
+              <span>probability</span> <strong>&gt; 0.90</strong>
+            </p>
+            <span class="decision-caption">
+              Only then does <code>approved</code> become true.
+            </span>
+          </div>
+          <div class="jev-detail">
+            <SlidersHorizontal size={21} aria-hidden="true" />
+            <h3>You set the bar.</h3>
+            <p>
+              Choose the threshold for the decision. A boolean isn't an
+              unexplained yes or no.
+            </p>
+          </div>
+          <div class="jev-detail">
+            <ScanSearch size={21} aria-hidden="true" />
+            <h3>Keep the evidence.</h3>
+            <p>
+              <code>decision_info</code> exposes the recorded probability and
+              threshold without another model call.
+            </p>
+          </div>
+          <p class="aside-caption">
+            Illustrative values, not a measured run. A probability is not a
+            correctness guarantee.
+          </p>
+        </aside>
+      </div>
+    </Tabs>
+    <a class="text-link jev-guide" href={guide}>
+      Explore the Jev integration <ArrowRight size={17} />
+    </a>
+  </div>
+</section>

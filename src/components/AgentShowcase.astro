@@ -1,0 +1,71 @@
+---
+import { ArrowRight, FileText, Search, PencilLine } from '@lucide/astro';
+import CodeWindow from './CodeWindow.astro';
+import examples from '../data/examples.json';
+
+interface Props {
+  docs: string;
+}
+const { docs } = Astro.props;
+---
+
+<section
+  id="agents"
+  class="section agents-section"
+  aria-labelledby="agents-title"
+>
+  <div class="container">
+    <div class="section-kicker">
+      <span>04 / PUT THE PIECES TO WORK</span>
+      <span class="side-note">ONE PROGRAM. A SMALL TEAM.</span>
+    </div>
+    <h2 id="agents-title">From building blocks to a working crew.</h2>
+    <p class="section-intro">
+      A researcher finds the breaking change. An editor explains the migration.
+      Profiles, tools, subagents, and typed answers, in the same program.
+    </p>
+    <div class="showcase-layout">
+      <CodeWindow example={examples.agent} id="agent" />
+      <aside class="showcase-aside" aria-label="Release team roles">
+        <ol class="workflow-steps">
+          <li>
+            <FileText size={21} aria-hidden="true" />
+            <div>
+              <span class="tiny-label">THE SOURCE</span>
+              <h3>A file, not a guess.</h3>
+              <p>The tool reads your project's changelog through Python.</p>
+              <a class="text-link" href="/examples/CHANGELOG.md">
+                Example changelog <ArrowRight size={15} />
+              </a>
+            </div>
+          </li>
+          <li>
+            <Search size={21} aria-hidden="true" />
+            <div>
+              <span class="tiny-label">THE RESEARCHER</span>
+              <h3>A focused job.</h3>
+              <p>
+                Its own instructions and tool access. A typed{' '}
+                <code>Findings</code> result.
+              </p>
+            </div>
+          </li>
+          <li>
+            <PencilLine size={21} aria-hidden="true" />
+            <div>
+              <span class="tiny-label">THE EDITOR</span>
+              <h3>The final word.</h3>
+              <p>
+                Delegates the research, then produces an announcement and a
+                typed migration checklist.
+              </p>
+            </div>
+          </li>
+        </ol>
+        <a class="text-link" href={`${docs}agentic-engineering/subagents/`}>
+          Explore subagents <ArrowRight size={17} />
+        </a>
+      </aside>
+    </div>
+  </div>
+</section>

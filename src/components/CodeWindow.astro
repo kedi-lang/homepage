@@ -1,0 +1,74 @@
+---
+import { Copy, Check, FileCode, RotateCcw } from '@lucide/astro';
+import { highlight } from '../lib/highlight';
+
+interface Props {
+  example: {
+    filename: string;
+    code: string;
+    values: { name: string; type: string; value: string }[];
+  };
+  id: string;
+  replay?: boolean;
+  compact?: boolean;
+}
+const { example, id, replay = false, compact = false } = Astro.props;
+---
+
+<div class:list={['code-window', { compact }]} data-demo={id}>
+  <div class="window-title">
+    <span class="filename">
+      <FileCode size={17} aria-hidden="true" />
+      {example.filename}
+    </span>
+    <button
+      class="icon-button"
+      type="button"
+      data-copy-code
+      aria-label={`Copy ${example.filename}`}
+      data-tooltip="Copy code"
+    >
+      <Copy size={16} class="copy-icon" />
+      <Check size={16} class="copied-icon" />
+    </button>
+  </div>
+  <div
+    class="code-body"
+    tabindex="0"
+    role="region"
+    aria-label={`${example.filename} source code`}
+  >
+    <pre><code>{example.code.split('\n').map((line, index) => <span class="code-line"><span class="line-number" aria-hidden="true">{index + 1}</span><span class="line-source">{highlight(line).map(token => <span class={token.kind ? `syntax-${token.kind}` : undefined}>{token.text}</span>)}{!line && '\u00a0'}</span></span>)}</code></pre>
+  </div>
+  <textarea
+    class="copy-source"
+    hidden
+    aria-hidden="true"
+  >{example.code}</textarea>
+  <div class="result-header">
+    <span>BOUND VALUES</span>
+    <span class="example-label">Illustrative output</span>
+  </div>
+  <div class="result-body" aria-live="polite" aria-atomic="true">
+    <dl class="value-list">
+      {example.values.map((value) => (
+        <div class="value-row">
+          <dt>{value.name}</dt>
+          <dd class="value-type">{value.type}</dd>
+          <dd class="value-result">{value.value}</dd>
+        </div>
+      ))}
+    </dl>
+    {replay && (
+      <button
+        type="button"
+        class="replay-button"
+        data-replay
+        aria-label={`Replay ${example.filename} example`}
+      >
+        <RotateCcw size={16} />
+        <span>Replay example</span>
+      </button>
+    )}
+  </div>
+</div>

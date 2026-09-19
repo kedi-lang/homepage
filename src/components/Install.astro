@@ -1,0 +1,43 @@
+---
+import { Copy, Check, ArrowUpRight } from '@lucide/astro';
+const { full = false } = Astro.props;
+---
+
+<div class:list={['install', { 'install-full': full }]}>
+  <div class="install-command">
+    <span class="shell-prefix" aria-hidden="true">
+      $
+    </span>
+    <code data-install-command>uv add kedi</code>
+    <button
+      class="icon-button"
+      type="button"
+      data-copy-install
+      aria-label="Copy install command"
+      data-tooltip="Copy command"
+    >
+      <Copy size={17} class="copy-icon" />
+      <Check size={17} class="copied-icon" />
+    </button>
+  </div>
+  {full ? (
+    <div class="install-meta">
+      <div class="package-switch" role="group" aria-label="Package manager">
+        <button type="button" data-package="uv" aria-pressed="true">
+          uv
+        </button>
+        <button type="button" data-package="pip" aria-pressed="false">
+          pip
+        </button>
+      </div>
+      <a href="https://kedi-lang.org/docs/getting-started/installation/">
+        Installation guide <ArrowUpRight size={14} />
+      </a>
+    </div>
+  ) : (
+    <span class="install-caption">
+      A small install.
+      <br />A different way to program.
+    </span>
+  )}
+</div>
