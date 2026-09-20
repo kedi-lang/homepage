@@ -21,31 +21,22 @@ check and writes the static site to `dist/`. `npm run preview` serves that build
 The production domain is <https://kedi-lang.org/>.
 
 Inside the Kedi workspace, this independent checkout lives at `website/`.
-It is not part of the Kedi package. The combined deployment places this
-repository's `dist/` at the domain root and the separately built documentation
-under `/docs/`.
+It is not part of the Kedi package. Documentation is built and published
+independently at <https://docs.kedi-lang.org/>.
 
 ## Publication
 
-The **Documentation** workflow in `kedi-lang/kedi-docs` owns the single Pages
-publication. It checks out an exact homepage commit, builds and tests both sites,
-then publishes them together. Do not deploy this repository's `dist/` directly
-over the documentation or configure a second custom domain here.
 The **Homepage** workflow runs Astro and Playwright checks on pushes and pull
-requests; this repository's standalone GitHub Pages/Jekyll publisher is disabled.
-
-Homepage `main` is checked approximately every 15 minutes (GitHub Actions
-schedules can be delayed). Unchanged revisions do not trigger another build.
-For an immediate release, run the publisher manually after pushing:
+requests. Pushes to `main` publish `dist/` to `https://kedi-lang.org` through
+GitHub Pages. It can also be dispatched manually:
 
 ```sh
-gh workflow run docs.yml --repo kedi-lang/kedi-docs --ref main
+gh workflow run checks.yml --repo kedi-lang/homepage --ref main
 ```
 
-`https://kedi-lang.org/deployment.json` records the published homepage, docs,
-and Kedi commit IDs. Existing documentation URLs redirect to `/docs/`, preserving
-query strings and section anchors. These are static HTML redirects, not HTTP 301
-responses. Raw Markdown and LLM indexes remain available at their old addresses.
+The custom 404 page redirects legacy `/docs/...` requests to the same path on
+`docs.kedi-lang.org`, preserving query strings and section anchors. Other missing
+pages retain a normal 404 surface with links back to the homepage and manual.
 
 Social-media covers are unrelated to the website. `assets/social/` is local-only
 and ignored by Git. It must never be copied into `public/` or the deployment
@@ -163,4 +154,4 @@ PYTHON_EOF
 
 Fonts are self-hosted Geist and Geist Mono. Icons use Lucide's Astro package.
 Dependencies are pinned with a lockfile. Documentation links point directly to
-`https://kedi-lang.org/docs/`; source repository links stay on GitHub.
+`https://docs.kedi-lang.org/`; source repository links stay on GitHub.

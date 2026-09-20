@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: homepage-${{ github.ref }}
@@ -27,3 +27,12 @@ jobs:
       - run: npm test
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
+      - name: Publish homepage
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@329bcc8f12caed2cefe5a5b80781499a6f3b361b # v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./dist
+          cname: kedi-lang.org
+          force_orphan: true

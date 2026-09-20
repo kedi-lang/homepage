@@ -1,0 +1,57 @@
+---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#f5f6f2" />
+    <title>Page not found - kedi</title>
+    <link rel="icon" href="/assets/kedi-favicon.webp" type="image/webp" />
+    <script is:inline>
+      if (location.pathname === '/docs' || location.pathname.startsWith('/docs/')) {
+        const path = location.pathname.slice('/docs'.length) || '/';
+        location.replace(`https://docs.kedi-lang.org${path}${location.search}${location.hash}`);
+      }
+    </script>
+  </head>
+  <body>
+    <main class="missing-page">
+      <p class="eyebrow">404</p>
+      <h1>This page wandered off.</h1>
+      <p>The manual now has its own home.</p>
+      <nav aria-label="Page not found">
+        <a class="button button-primary" href="https://docs.kedi-lang.org/">Open documentation</a>
+        <a class="button" href="/">Back to kedi</a>
+      </nav>
+    </main>
+  </body>
+</html>
+
+<style>
+  .missing-page {
+    min-height: 100vh;
+    display: grid;
+    place-content: center;
+    justify-items: start;
+    gap: 1rem;
+    width: min(100% - 2rem, 42rem);
+    margin: 0 auto;
+  }
+
+  .missing-page h1,
+  .missing-page p {
+    margin: 0;
+  }
+
+  .missing-page nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+</style>

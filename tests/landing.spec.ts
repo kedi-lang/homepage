@@ -91,15 +91,15 @@ for (const width of [320, 390, 768, 1440, 1920]) {
       /Program with natural language\.\s*Typed by design\./,
     );
     await expect(page.locator('.site-header .brand')).toHaveAccessibleName(
-      'Kedi home',
+      'kedi home',
     );
     await expect(page.locator('.site-header .brand span')).toHaveCount(0);
-    await expect(page.locator('.site-footer .brand span')).toHaveText('Kedi');
+    await expect(page.locator('.site-footer .brand span')).toHaveText('kedi');
     await expect(
-      page.getByRole('heading', { name: 'Kedi', exact: true }),
+      page.getByRole('heading', { name: 'kedi', exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Kedi Harness', exact: true }),
+      page.getByRole('heading', { name: 'kedi Harness', exact: true }),
     ).toBeVisible();
     await expect(page.locator('#agents-title')).toBeVisible();
     await expect(page.locator('#jev-title')).toBeVisible();
@@ -147,7 +147,7 @@ for (const width of [320, 390, 768, 1440, 1920]) {
       page.getByRole('link', { name: 'Explore the Jev integration' }),
     ).toHaveAttribute(
       'href',
-      'https://kedi-lang.org/docs/agent-adapters/typesafe/',
+      'https://docs.kedi-lang.org/agent-adapters/typesafe/',
     );
     await page.evaluate(() => window.scrollTo(0, 0));
     await expect(page.locator('[data-demo="template"] .code-line')).toHaveCount(
@@ -384,7 +384,7 @@ test('notebook launch and setup commands are copyable', async ({
   ).toHaveAttribute('href', '/assets/kedi-notebook.png');
   await expect(
     page.getByRole('link', { name: 'Notebook setup guide' }),
-  ).toHaveAttribute('href', 'https://kedi-lang.org/docs/tooling/notebook/');
+  ).toHaveAttribute('href', 'https://docs.kedi-lang.org/tooling/notebook/');
 });
 
 test('mobile menu opens, closes on navigation, and supports Escape', async ({
@@ -459,4 +459,20 @@ test('source remains readable without JavaScript', async ({
     page.locator('[data-demo="hero"] .value-result').first(),
   ).toHaveText('Hayao Miyazaki');
   await context.close();
+});
+
+test('legacy documentation paths preserve their suffix, query, and fragment', async ({
+  page,
+}) => {
+  await page.route('https://docs.kedi-lang.org/**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      body: '<title>kedi documentation</title>',
+    });
+  });
+  await page.goto('/docs/core-language/templates-and-invokes/?source=legacy#template');
+  await expect(page).toHaveURL(
+    'https://docs.kedi-lang.org/core-language/templates-and-invokes/?source=legacy#template',
+  );
 });
