@@ -178,7 +178,9 @@ for (const width of [320, 390, 768, 1440, 1920]) {
       path: testInfo.outputPath(`hero-${width}.png`),
       animations: 'disabled',
     });
-    for (const image of await page.locator('img[loading="lazy"]').all()) {
+    for (const image of await page
+      .locator('img[loading="lazy"]:visible')
+      .all()) {
       // The ferry moves continuously; scrolling must not wait for a stable box.
       await image.evaluate((element) =>
         element.scrollIntoView({ behavior: 'instant', block: 'center' }),
@@ -197,7 +199,7 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     await expect
       .poll(async () =>
         page
-          .locator('img')
+          .locator('img:visible')
           .evaluateAll((images) =>
             images.every(
               (image) =>
@@ -381,10 +383,79 @@ test('notebook launch and setup commands are copyable', async ({
   ).toBeLessThanOrEqual(320);
   await expect(
     page.getByRole('link', { name: 'View full-size Kedi Notebook screenshot' }),
-  ).toHaveAttribute('href', '/assets/kedi-notebook.png');
+  ).toHaveAttribute('href', '/assets/kedi-notebook-current.webp');
   await expect(
     page.getByRole('link', { name: 'Notebook setup guide' }),
   ).toHaveAttribute('href', 'https://docs.kedi-lang.org/tooling/notebook/');
+});
+
+for (const width of [320, 390, 768, 1440, 1920]) {
+  test(`interactive screenshots retain their proportions at ${width}px`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/#notebook');
+    for (const [tab, asset, dimensions] of [
+      ['Notebook', 'kedi-notebook-current.webp', [2400, 1160]],
+      ['Terminal REPL', 'kedi-repl.webp', [1981, 794]],
+    ] as const) {
+      await page.getByRole('tab', { name: tab, exact: true }).click();
+      const preview = page.locator(
+        `.notebook-preview img[src="/assets/${asset}"]`,
+      );
+      await preview.scrollIntoViewIfNeeded();
+      await expect(preview).toBeVisible();
+      await expect(preview).toHaveJSProperty('naturalWidth', dimensions[0]);
+      await expect(preview).toHaveJSProperty('naturalHeight', dimensions[1]);
+      const size = await preview.boundingBox();
+      expect(size!.width / size!.height).toBeCloseTo(
+        dimensions[0] / dimensions[1],
+        2,
+      );
+      expect(size!.width).toBeLessThanOrEqual(width);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(width);
+      const metadata = await sharp(`public/assets/${asset}`).metadata();
+      expect([metadata.width, metadata.height]).toEqual([...dimensions]);
+      if (width === 390 || width === 1440) {
+        await page.locator('#notebook').screenshot({
+          path: testInfo.outputPath(`${asset}-${width}.png`),
+          animations: 'disabled',
+        });
+      }
+    }
+  });
+}
+
+test('REPL tab supports keyboard navigation and command copying', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/#notebook');
+  const notebook = page.getByRole('tab', { name: 'Notebook', exact: true });
+  const repl = page.getByRole('tab', { name: 'Terminal REPL', exact: true });
+  await notebook.focus();
+  await notebook.press('ArrowRight');
+  await expect(repl).toBeFocused();
+  await expect(repl).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#interactive-panel-notebook')).toBeHidden();
+  await expect(page.locator('#interactive-panel-repl')).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Copy REPL command', exact: true })
+    .click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    'kedi --idle',
+  );
+  await expect(
+    page.getByRole('link', { name: 'Explore the REPL' }),
+  ).toHaveAttribute('href', 'https://docs.kedi-lang.org/tooling/repl/');
+  await repl.focus();
+  await repl.press('Home');
+  await expect(notebook).toBeFocused();
+  await expect(page.locator('#interactive-panel-repl')).toBeHidden();
+  await expect(page.locator('#interactive-panel-notebook')).toBeVisible();
 });
 
 test('mobile menu opens, closes on navigation, and supports Escape', async ({
@@ -471,7 +542,9 @@ test('legacy documentation paths preserve their suffix, query, and fragment', as
       body: '<title>kedi documentation</title>',
     });
   });
-  await page.goto('/docs/core-language/templates-and-invokes/?source=legacy#template');
+  await page.goto(
+    '/docs/core-language/templates-and-invokes/?source=legacy#template',
+  );
   await expect(page).toHaveURL(
     'https://docs.kedi-lang.org/core-language/templates-and-invokes/?source=legacy#template',
   );

@@ -8,24 +8,28 @@
   gap: 60px;
   align-items: start;
 }
-.notebook-launch {
+.interactive-heading {
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+.interactive-launch {
   min-width: 0;
   padding-top: 5px;
 }
-.notebook-launch .install-command {
+.interactive-launch .install-command {
   width: 100%;
 }
-.notebook-launch .install-command code {
+.interactive-launch .install-command code {
   min-width: 0;
   overflow-wrap: anywhere;
   white-space: normal;
   line-height: 1.65;
 }
-.notebook-launch .install-command .icon-button {
+.interactive-launch .install-command .icon-button {
   flex-shrink: 0;
   margin-left: auto;
 }
-.notebook-launch [data-tooltip]::after {
+.interactive-launch [data-tooltip]::after {
   left: auto;
   right: 0;
   transform: none;
@@ -70,8 +74,9 @@
   background: #101214;
 }
 .notebook-preview img {
+  display: block;
   width: 100%;
-  aspect-ratio: 2048 / 689;
+  height: auto;
 }
 .notebook-expand {
   display: flex;

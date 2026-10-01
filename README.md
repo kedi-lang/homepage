@@ -56,13 +56,19 @@ artifact. Only the built `dist/` directory is a publishable website output.
   `Probability` share one request. Python applies the priority rule locally.
   The threshold is illustrative application policy, not a calibration result.
 - Kedi Harness teaser explicitly marked coming soon.
-- A local Notebook section with its real screenshot, `kedi notebook` launch
+- An interactive section with Notebook and Terminal REPL tabs, current screenshots, `kedi notebook` launch
   command, source-checkout setup, and cell-to-cell state example.
 - Discord community links in the main and footer navigation.
 - Installation command switching/copying and an animated Bosphorus ferry.
 - Responsive layouts, keyboard-operated tabs/menu, and reduced-motion support.
 
-All displayed outputs are curated **illustrative output**, not live model calls
+The interactive section uses a capture of the current notebook after executing
+two cells, plus the approved REPL image from the Kedi README. Both images retain
+their native proportions, link to the full-size asset, and use lossless WebP.
+The notebook uses `> show:` to read captures across cells; the REPL command is
+`kedi --idle`, with highlighting enabled by default and `--no-color` to disable it.
+
+The replayable code examples use curated **illustrative output**, not live model calls
 or measured recordings. Replay is visual playback only. There are no model
 latency, accuracy, or cost claims. The examples are stored in
 `src/data/examples.json`; rendered code and clipboard text share that source.
