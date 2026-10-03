@@ -82,8 +82,8 @@ The header, footer, and favicon use the supplied monochrome Kedi emblem.
 Its original JPEG and reproducible transparent extraction are in `assets/source/`.
 The cat gently leans on hover/focus and greets with "Meow!". Replay only animates
 the code example; it does not move the cat. The ferry's paw control toggles
-Pause/Play. Reduced motion disables movement. Grooming/walking sprite animation
-is not implemented in this first prototype.
+Pause/Play. Reduced motion disables movement. The cat uses a hover/focus pose;
+there are no grooming or walking animation sequences.
 
 The standalone snippets inherit the user's configured model. The release-team
 example selects `google/gemini-3-flash-preview` directly through Google, with

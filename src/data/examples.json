@@ -54,7 +54,7 @@
   },
   "loop": {
     "filename": "grounded_copy.kedi",
-    "code": "[facts] = CSV export ships Monday. PDF is not available.\n[draft] = Export any report as CSV or PDF today.\n\n> loop: <draft> makes promises not supported by <facts>\n  >> Rewrite <draft> using only <facts>: [revision]\n  [draft] := <revision>\n\n= <draft>",
+    "code": "[facts] = CSV export ships Monday. PDF is not available.\n[draft] = Export any report as CSV or PDF today.\n\n> loop: <draft> makes promises not supported by <facts>\n  >> A revision of <draft> supported only by <facts> would read [revision].\n  [draft] := <revision>\n\n= <draft>",
     "values": [
       {
         "name": "draft",
@@ -65,7 +65,7 @@
   },
   "map": {
     "filename": "issue_inbox.kedi",
-    "code": "[reports: list[str]] = `[\"CSV loses the last row.\", \"Please add a dark theme.\"]`\n[bugs: list[str]] = `[]`\n\n> loop [report]: `reports`:\n  >> <report> describes a defect: [is_bug: bool].\n  The issue title is [title: str].\n> map:\n  > if: `is_bug`:\n    `bugs.append(title)`\n\n= `bugs`",
+    "code": "[reports: list[str]] = `[\"CSV loses the last row.\", \"Please add a dark theme.\"]`\n[bugs: list[str]] = `[]`\n\n> loop [report]: `reports`:\n  >> It is [is_bug: bool] that <report> describes a defect.\n  The issue title is [title: str].\n> map:\n  > if: `is_bug`:\n    `bugs.append(title)`\n\n= `bugs`",
     "values": [
       {
         "name": "bugs",
@@ -97,7 +97,7 @@
   },
   "procedure": {
     "filename": "on_call.kedi",
-    "code": "~Brief(problem: str, next_step: str)\n\n@handoff(report: str) -> Brief:\n  >> Turn <report> into an on-call handoff: [brief: Brief]\n  = `brief`\n\n[report] = Checkout times out only after a coupon is applied.\n[brief: Brief] = <handoff(<report>)>\n\n= `brief`",
+    "code": "~Brief(problem: str, next_step: str)\n\n@handoff(report: str) -> Brief:\n  >> The on-call handoff for <report> is [brief: Brief].\n  = `brief`\n\n[report] = Checkout times out only after a coupon is applied.\n[brief: Brief] = <handoff(<report>)>\n\n= `brief`",
     "values": [
       {
         "name": "brief.problem",
@@ -113,7 +113,7 @@
   },
   "tool": {
     "filename": "stock_check.kedi",
-    "code": "```\nimport json\nfrom pathlib import Path\n```\n\n@stock(item: str) -> int:\n  = `json.loads(Path(\"inventory.json\").read_text())[item]`\n\n> approval: allow\n> use: stock\n>> Check stock for \"field-notebook\": [remaining: int]. Can it fill an order of 4? [can_fulfill: bool].\n\n= `can_fulfill`",
+    "code": "```\nimport json\nfrom pathlib import Path\n```\n\n@stock(item: str) -> int:\n  = ```\n  path = Path(\"inventory.json\")\n  return json.loads(path.read_text())[item]\n  ```\n\n> approval: allow\n> use: stock\n>> The stock tool reports [remaining: int] units of \"field-notebook\". It is [can_fulfill: bool] that this can fill an order of 4.\n\n= `can_fulfill`",
     "values": [
       {
         "name": "remaining",
@@ -129,7 +129,7 @@
   },
   "agent": {
     "filename": "release_team.kedi",
-    "code": "> import: filesystem\n> model: google/gemini-3-flash-preview\n\n> profile: researcher:\n  > system: Read CHANGELOG.md. Find required v2.0 migrations.\n  > use: read_text_file\n  > output: list[str]\n\n> profile: editor:\n  > subagent: researcher\n\n> use: editor\n>> Ask the researcher for v2.0 migrations as a checklist: [steps: list[str]].\n\n= `steps`",
+    "code": "> import: filesystem\n> model: google/gemini-3-flash-preview\n\n> profile: researcher:\n  > instructions: Read CHANGELOG.md. Find required v2.0 migrations.\n  > use: read_text_file\n  > output: list[str]\n\n> profile: editor:\n  > subagent: researcher\n\n> use: editor\n>> The v2.0 migration checklist reported by the researcher is [steps: list[str]].\n\n= `steps`",
     "values": [
       {
         "name": "steps",
@@ -140,7 +140,7 @@
   },
   "jev": {
     "filename": "ticket_triage.kedi",
-    "code": "```\nfrom typing import Literal\nfrom kedi.typesafe import Probability\n```\n\n> model: typesafe/jev-latest\n[ticket] = I was charged twice. Reverse it or I cancel today.\n\n>> <ticket> belongs to [queue: Literal[\"billing\", \"technical\"]]. The probability the customer intends to cancel is [churn: Probability].\n\n= `{\"queue\": queue, \"priority\": churn >= 0.8}`",
+    "code": "> import: decisions\n> model: typesafe/jev-latest\n\n[ticket] = I was charged twice. Reverse it or I cancel today.\n\n>> <ticket> belongs to [queue: Literal[\"billing\", \"technical\"]]. The probability the customer intends to cancel is [churn: Probability].\n\n= `{\"queue\": queue, \"priority\": churn >= 0.8}`",
     "values": [
       {
         "name": "queue",
