@@ -1,0 +1,15 @@
+> import: filesystem
+> model: google/gemini-3-flash-preview
+
+> profile: researcher:
+  > instructions: Read CHANGELOG.md. Find required v2.0 migrations.
+  > use: read_text_file
+  > output: list[str]
+
+> profile: editor:
+  > subagent: researcher
+
+> use: editor
+>> The v2.0 migration checklist reported by the researcher is [steps: list[str]].
+
+= `steps`
