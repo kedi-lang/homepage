@@ -1,6 +1,11 @@
 @import './base.css';
 @import './sections.css';
 @import './showcases.css';
+@import './scope.css';
+@import './decision.css';
+@import './capture.css';
 @import './notebook.css';
+@import './repl.css';
+@import './notebook-playback.css';
 @import './team.css';
 @import './responsive.css';

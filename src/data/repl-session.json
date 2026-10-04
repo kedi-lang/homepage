@@ -1,0 +1,26 @@
+{
+  "command": "kedi --idle",
+  "verifiedOn": "2026-10-04",
+  "steps": [
+    {
+      "input": "> model: openai/gpt-6-luna",
+      "output": [],
+      "waitMs": 300
+    },
+    {
+      "input": ">> [city] is the city of cats.",
+      "output": [],
+      "waitMs": 2100
+    },
+    {
+      "input": "> show: `city.upper()`",
+      "output": ["ISTANBUL"],
+      "waitMs": 200
+    },
+    {
+      "input": "> show: Cats love <city>.",
+      "output": ["Cats love Istanbul."],
+      "waitMs": 200
+    }
+  ]
+}

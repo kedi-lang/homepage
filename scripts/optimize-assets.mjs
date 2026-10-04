@@ -22,6 +22,7 @@ await sharp(rgba, {
 
 const widths = {
   istanbul: 1660,
+  'istanbul-extended': 1448,
   cat: 320,
   harness: 1000,
   ferry: 900,

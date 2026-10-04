@@ -1,0 +1,16 @@
+{
+  "title": "City notes",
+  "verifiedOn": "2026-10-04",
+  "steps": [
+    {
+      "input": "> model: openai/gpt-6-luna\n>> In T\u00fcrkiye, [city: str] spans the [strait: str].",
+      "output": [],
+      "waitMs": 2100
+    },
+    {
+      "input": "> show: <city> spans the <strait>.",
+      "output": ["Istanbul spans the Bosphorus Strait."],
+      "waitMs": 250
+    }
+  ]
+}

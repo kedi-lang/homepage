@@ -1,0 +1,186 @@
+---
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  Expand,
+  LoaderCircle,
+  Copy,
+  Check,
+} from '@lucide/astro';
+import session from '../data/notebook-session.json';
+import { highlight } from '../lib/highlight';
+import { notebookDuration } from '../lib/notebook-timeline';
+import { formatPlaybackTime } from '../lib/recording';
+
+const transcript = session.steps
+  .map(
+    (step, index) => `[${index + 1}]\n${step.input}\n${step.output.join('\n')}`,
+  )
+  .join('\n\n');
+---
+
+<div class="notebook-player" data-notebook-player data-state="ready">
+  <header class="notebook-titlebar">
+    <span class="notebook-brand">
+      <img src="/assets/kedi-logo.svg" width="30" height="24" alt="kedi" />
+      <span>Notebook</span>
+    </span>
+    <span class="notebook-document">{session.title}</span>
+    <a
+      class="icon-button"
+      href="/assets/kedi-notebook-current.webp"
+      target="_blank"
+      rel="noopener"
+      aria-label="View full-size Kedi Notebook screenshot"
+      data-tooltip="Original screenshot"
+    >
+      <Expand size={16} />
+    </a>
+  </header>
+  <div class="notebook-runtime" aria-hidden="true">
+    <span>
+      <i></i>
+      <span data-notebook-runtime>Ready</span>
+    </span>
+    <span>Recorded session</span>
+  </div>
+  <pre
+    class="sr-only"
+    aria-label="Recorded Kedi Notebook session"
+  >{transcript}</pre>
+  <div class="notebook-cells">
+    {session.steps.map((step, index) => (
+      <div
+        class="notebook-cell"
+        data-notebook-cell={index}
+        data-phase="complete"
+      >
+        <div class="notebook-gutter">
+          <button
+            class="icon-button"
+            type="button"
+            data-notebook-cell-play={index}
+            aria-label={`Replay notebook cell ${index + 1}`}
+            data-tooltip={`Replay cell ${index + 1}`}
+            disabled
+          >
+            <Play size={16} />
+          </button>
+          <span aria-hidden="true">[{index + 1}]</span>
+        </div>
+        <div class="notebook-cell-body">
+          <div class="notebook-cell-heading">
+            <span aria-hidden="true">KEDI</span>
+            <div class="notebook-cell-actions">
+              <span class="notebook-cell-state" aria-hidden="true">
+                <LoaderCircle size={12} stroke-dasharray="1 3" />
+                <span data-notebook-cell-status>Done</span>
+              </span>
+              <button
+                class="icon-button"
+                type="button"
+                data-copy-code
+                aria-label={`Copy notebook cell ${index + 1}`}
+                data-tooltip="Copy cell"
+                disabled
+              >
+                <Copy size={14} class="copy-icon" />
+                <Check size={14} class="copied-icon" />
+              </button>
+            </div>
+          </div>
+          <div class="notebook-editor" aria-hidden="true">
+            {step.input.split('\n').map((line, lineIndex) => (
+              <div class="notebook-code-line" data-notebook-line>
+                <span class="notebook-line-number">{lineIndex + 1}</span>
+                <code>
+                  <span class="notebook-measure">{line + ' '}</span>
+                  <span class="notebook-live">
+                    {highlight(line).map((token) => (
+                      <span
+                        data-notebook-token
+                        class={token.kind ? `syntax-${token.kind}` : undefined}
+                      >
+                        {token.text}
+                      </span>
+                    ))}
+                  </span>
+                </code>
+              </div>
+            ))}
+          </div>
+          <div class="notebook-copy-fallback" hidden>
+            <label for={`notebook-source-${index}`}>
+              Clipboard unavailable. Copy the cell below.
+            </label>
+            <textarea
+              id={`notebook-source-${index}`}
+              class="copy-source"
+              readonly
+              spellcheck="false"
+              rows={step.input.split('\n').length + 1}
+            >{step.input}</textarea>
+          </div>
+          {step.output.length > 0 && (
+            <div class="notebook-cell-output" aria-hidden="true">
+              <span>OUTPUT</span>
+              {step.output.map((line) => (
+                <samp>{line}</samp>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+  <div
+    class="repl-controls notebook-controls"
+    role="group"
+    aria-label="Notebook session playback"
+  >
+    <button
+      class="icon-button"
+      type="button"
+      data-notebook-toggle
+      aria-label="Play notebook session"
+      data-tooltip="Play session"
+      disabled
+    >
+      <Play size={18} class="repl-play-icon" />
+      <Pause size={18} class="repl-pause-icon" />
+    </button>
+    <button
+      class="icon-button"
+      type="button"
+      data-notebook-restart
+      aria-label="Restart notebook session"
+      data-tooltip="Restart"
+      disabled
+    >
+      <RotateCcw size={17} />
+    </button>
+    <input
+      type="range"
+      min="0"
+      max={notebookDuration}
+      step="100"
+      value={notebookDuration}
+      aria-label="Notebook playback position"
+      aria-valuetext={`${formatPlaybackTime(notebookDuration)} of ${formatPlaybackTime(notebookDuration)}`}
+      data-notebook-seek
+      disabled
+    />
+    <span class="repl-clock">
+      <span data-notebook-time>{formatPlaybackTime(notebookDuration)}</span>
+      <span class="repl-clock-divider"> / </span>
+      {formatPlaybackTime(notebookDuration)}
+    </span>
+  </div>
+  <span
+    class="sr-only"
+    role="status"
+    aria-live="polite"
+    data-notebook-status
+  ></span>
+</div>

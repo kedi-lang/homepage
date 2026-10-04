@@ -1,0 +1,327 @@
+.notebook-player {
+  margin-top: 24px;
+  border: 1px solid #555f63;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #101416;
+  color: #dce2e5;
+}
+.notebook-titlebar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 9px 16px;
+  border-bottom: 1px solid #30373b;
+  background: #1a2023;
+  font-size: 13px;
+}
+.notebook-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.notebook-brand img {
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.notebook-document {
+  color: #a8b3b9;
+}
+.notebook-titlebar .icon-button {
+  justify-self: end;
+  color: #c2ccd1;
+}
+.notebook-player .icon-button:hover {
+  background: #303a3f;
+}
+.notebook-player .icon-button:focus-visible {
+  outline-color: #b4d3b7;
+}
+.notebook-player .icon-button:active:not(:disabled) {
+  background: #3c494e;
+}
+.notebook-player .icon-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.notebook-player .copied-icon {
+  color: #a4d5b5;
+}
+.notebook-titlebar [data-tooltip]::after {
+  top: calc(100% + 8px);
+  bottom: auto;
+  right: 0;
+  left: auto;
+  transform: none;
+}
+.notebook-runtime {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 18px;
+  border-bottom: 1px solid #242c30;
+  color: #9aabb4;
+  font: 11px var(--mono);
+}
+.notebook-runtime > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.notebook-runtime i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #9ac7ad;
+}
+.notebook-cells {
+  padding: 16px 20px 20px 12px;
+}
+.notebook-cell {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 8px;
+}
+.notebook-cell + .notebook-cell {
+  margin-top: 18px;
+}
+.notebook-gutter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 38px;
+}
+.notebook-gutter .icon-button {
+  width: 32px;
+  height: 32px;
+  color: #a4d5b5;
+}
+.notebook-gutter > span {
+  color: #8b9da7;
+  font: 11px var(--mono);
+}
+.notebook-gutter [data-tooltip]::after {
+  left: 0;
+  right: auto;
+  transform: none;
+}
+.notebook-cell-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 32px;
+  color: #8d9ca5;
+  font: 10px var(--mono);
+}
+.notebook-cell-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.notebook-cell-actions .icon-button {
+  width: 28px;
+  height: 28px;
+  color: #b1c1ca;
+}
+.notebook-cell-actions [data-tooltip]::after {
+  right: 0;
+  left: auto;
+  transform: none;
+}
+.notebook-cell-state {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.notebook-cell-state svg {
+  visibility: hidden;
+  animation: notebook-wait 1.2s linear infinite paused;
+}
+.notebook-cell[data-phase='running'] .notebook-cell-state svg {
+  visibility: visible;
+}
+.notebook-player[data-state='playing'] .notebook-cell-state svg {
+  animation-play-state: running;
+}
+.notebook-editor {
+  border: 1px solid #303a40;
+  border-radius: 3px;
+  background: #171d21;
+  padding: 12px 10px;
+}
+.notebook-cell[data-phase='editing'] .notebook-editor,
+.notebook-cell[data-phase='running'] .notebook-editor {
+  border-color: #799b8c;
+}
+.notebook-code-line {
+  display: grid;
+  grid-template-columns: 2ch minmax(0, 1fr);
+  gap: 12px;
+  font: 14px / 1.65 var(--mono);
+}
+.notebook-line-number {
+  color: #8b9da7;
+  user-select: none;
+}
+.notebook-code-line code {
+  display: grid;
+  min-width: 0;
+  font: inherit;
+  color: #b9dbad;
+}
+.notebook-code-line code > span {
+  grid-area: 1 / 1;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.notebook-measure {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+.notebook-editor .syntax-keyword {
+  color: #eba1ce;
+}
+.notebook-editor .syntax-binding {
+  color: #f2cb97;
+  background: transparent;
+}
+.notebook-editor .syntax-input {
+  color: #a5d9e0;
+}
+.notebook-editor .syntax-python {
+  color: #cebbeb;
+}
+.notebook-code-line.is-typing .notebook-live::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  vertical-align: -0.15em;
+  background: #dce2e5;
+}
+.notebook-cell-output {
+  margin: 12px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid #34443d;
+}
+.notebook-cell-output > span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8d9ca5;
+  font: 10px var(--mono);
+}
+.notebook-cell-output samp {
+  display: block;
+  font: 14px / 1.65 var(--mono);
+  overflow-wrap: anywhere;
+}
+.notebook-copy-fallback {
+  margin-top: 12px;
+}
+.notebook-copy-fallback label {
+  display: block;
+  margin-bottom: 6px;
+  color: #f2cb97;
+  font-size: 12px;
+}
+.notebook-copy-fallback textarea {
+  display: block;
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  resize: vertical;
+  border: 1px solid #799b8c;
+  border-radius: 3px;
+  background: #171d21;
+  color: #dce2e5;
+  font: 13px / 1.5 var(--mono);
+}
+.notebook-copy-fallback textarea:focus-visible {
+  outline: 2px solid #b4d3b7;
+  outline-offset: 2px;
+}
+.notebook-controls {
+  background: #1a2226;
+  border-top-color: #303a40;
+}
+@keyframes notebook-wait {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .notebook-cell-state svg {
+    animation: none;
+  }
+}
+@media (max-width: 680px) {
+  .notebook-titlebar {
+    padding: 7px 10px;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .notebook-brand {
+    gap: 6px;
+  }
+  .notebook-brand img {
+    width: 25px;
+  }
+  .notebook-document {
+    font-size: 11px;
+  }
+  .notebook-runtime {
+    padding: 8px 12px;
+    font-size: 10px;
+    gap: 8px;
+  }
+  .notebook-cells {
+    padding: 10px 10px 16px 4px;
+  }
+  .notebook-cell {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 4px;
+  }
+  .notebook-gutter .icon-button {
+    width: 28px;
+  }
+  .notebook-gutter {
+    padding-top: 32px;
+  }
+  .notebook-editor {
+    padding: 8px 6px;
+  }
+  .notebook-code-line {
+    font-size: 12px;
+    line-height: 1.55;
+    gap: 6px;
+  }
+  .notebook-cell-output samp {
+    font-size: 12px;
+    line-height: 1.55;
+  }
+}
+@media (pointer: coarse) {
+  .notebook-player .icon-button {
+    width: 44px;
+    height: 44px;
+  }
+  .notebook-cell {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  .notebook-cell-heading {
+    height: 44px;
+  }
+  .notebook-gutter {
+    padding-top: 40px;
+  }
+  .notebook-controls input {
+    height: 44px;
+  }
+  .notebook-copy-fallback textarea {
+    font-size: 16px;
+  }
+}

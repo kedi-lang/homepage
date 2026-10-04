@@ -6,15 +6,11 @@
     width: min(750px, calc(100% - 120px));
   }
   .cat-button {
-    width: 85px;
-    right: -87px;
-    bottom: -55px;
+    --cat-width: 85px;
+    right: max(16px, calc((100% - 750px) / 2 - 87px));
   }
   .hero-statement {
     font-size: 25px;
-  }
-  .language-example {
-    gap: 40px;
   }
   .example-layout,
   .composition-panel {
@@ -48,18 +44,14 @@
     width: calc(100% - 64px);
   }
   .cat-button {
-    width: 69px;
-    right: -24px;
-    bottom: -89px;
+    --cat-width: 69px;
+    right: 16px;
   }
   .hero h1 {
     font-size: 106px;
   }
   .hero {
     min-height: 0;
-  }
-  .hero-landscape {
-    object-position: 45% bottom;
   }
   .hero-content {
     padding-bottom: 80px;
@@ -83,15 +75,6 @@
     margin-top: 20px;
     max-width: none;
   }
-  .anatomy-grid {
-    gap: 20px;
-  }
-  .anatomy-grid > div {
-    grid-template-columns: 1fr;
-  }
-  .anatomy-grid p {
-    grid-column: 1;
-  }
   .sentence-example {
     font-size: 20px;
   }
@@ -103,8 +86,7 @@
   .claim-text {
     font-size: 22px;
   }
-  .composition-note h3,
-  .section-aside h3 {
+  .composition-note h3 {
     font-size: 25px;
   }
   .harness-layout {
@@ -200,16 +182,12 @@
   .hero-demo {
     margin-top: 23px;
   }
-  .hero-landscape {
-    object-position: 42% bottom;
-  }
   .hero-eyebrow {
     font-size: 9px;
   }
   .cat-button {
-    width: 62px;
-    right: -5px;
-    bottom: -80px;
+    --cat-width: 62px;
+    right: 18px;
   }
   pre {
     font-size: 11px;
@@ -310,36 +288,6 @@
     font-size: 17px;
     margin-top: 26px;
     padding-block: 20px;
-  }
-  .anatomy-grid {
-    grid-template-columns: 1fr;
-    margin-block: 24px 38px;
-    gap: 22px;
-  }
-  .anatomy-grid > div {
-    grid-template-columns: 26px 1fr;
-    gap: 5px 10px;
-  }
-  .anatomy-grid p {
-    grid-column: 2;
-    max-width: 310px;
-  }
-  .anatomy-grid h3 {
-    font-size: 17px;
-  }
-  .language-example {
-    grid-template-columns: 1fr;
-    gap: 26px;
-  }
-  .section-aside h3 {
-    font-size: 27px;
-  }
-  .section-aside p {
-    max-width: 100%;
-    font-size: 15px;
-  }
-  .section-aside h3 br {
-    display: none;
   }
   .section-heading-row > p {
     font-size: 15px;

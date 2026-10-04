@@ -1,17 +1,58 @@
-export {};
+import { initWindowMovement } from './window-movement';
+import { initReplPlayback } from './repl-playback';
+import { initNotebookPlayback } from './notebook-playback';
+import {
+  initCaptureDemo,
+  initScopeInspector,
+  initDecisionDemo,
+} from './showcase-interactions';
+
+initWindowMovement();
+initCaptureDemo();
+initScopeInspector();
+initDecisionDemo();
+initReplPlayback();
+initNotebookPlayback();
 
 const status = document.querySelector<HTMLElement>('#copy-status');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const copyTimers = new WeakMap<HTMLButtonElement, number>();
 
 async function copy(text: string, button: HTMLButtonElement) {
+  const tooltip =
+    button.dataset.copyTooltip ?? button.dataset.tooltip ?? 'Copy';
+  button.dataset.copyTooltip = tooltip;
+  window.clearTimeout(copyTimers.get(button));
+  button.classList.remove('is-copied');
+  button.disabled = true;
+  if (status) status.textContent = '';
+  const fallback = button
+    .closest('.notebook-cell')
+    ?.querySelector<HTMLElement>('.notebook-copy-fallback');
   try {
     await navigator.clipboard.writeText(text);
+    if (fallback) fallback.hidden = true;
     button.classList.add('is-copied');
+    button.dataset.tooltip = 'Copied';
     if (status) status.textContent = 'Copied to clipboard.';
-    window.setTimeout(() => button.classList.remove('is-copied'), 1600);
+    copyTimers.set(
+      button,
+      window.setTimeout(() => {
+        button.classList.remove('is-copied');
+        button.dataset.tooltip = tooltip;
+      }, 1600),
+    );
   } catch {
+    button.dataset.tooltip = tooltip;
     if (status)
       status.textContent = 'Clipboard unavailable. Select the code to copy it.';
+    if (fallback) {
+      fallback.hidden = false;
+      const source = fallback.querySelector('textarea')!;
+      source.focus();
+      source.select();
+      return;
+    }
     const source =
       button.closest('.code-window')?.querySelector('pre') ??
       button.closest('.install-command')?.querySelector('code');
@@ -21,15 +62,18 @@ async function copy(text: string, button: HTMLButtonElement) {
       window.getSelection()?.removeAllRanges();
       window.getSelection()?.addRange(range);
     }
+  } finally {
+    button.disabled = false;
   }
 }
 
 document
   .querySelectorAll<HTMLButtonElement>('[data-copy-code]')
   .forEach((button) => {
+    button.disabled = false;
     button.addEventListener('click', () => {
       const source = button
-        .closest('.code-window')
+        .closest('.code-window, .notebook-cell')
         ?.querySelector<HTMLTextAreaElement>('.copy-source');
       if (source) void copy(source.value, button);
     });
@@ -168,6 +212,9 @@ function setPaused(paused: boolean) {
   motionButton.setAttribute('aria-pressed', String(paused));
   motionButton.setAttribute('aria-label', paused ? 'Play' : 'Pause');
   motionButton.dataset.tooltip = paused ? 'Play' : 'Pause';
+  document.dispatchEvent(
+    new CustomEvent('kedi:motion-change', { detail: paused }),
+  );
 }
 setPaused(reducedMotion.matches);
 motionButton.addEventListener('click', () =>

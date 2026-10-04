@@ -1,6 +1,8 @@
 ---
-import { ArrowRight, Copy, Check, Expand } from '@lucide/astro';
+import { ArrowRight, Copy, Check } from '@lucide/astro';
 import Tabs from './Tabs.astro';
+import ReplPlayback from './ReplPlayback.astro';
+import NotebookPlayback from './NotebookPlayback.astro';
 
 const guide = 'https://docs.kedi-lang.org/tooling/notebook/';
 ---
@@ -86,36 +88,7 @@ const guide = 'https://docs.kedi-lang.org/tooling/notebook/';
             </details>
           </div>
         </div>
-        <figure class="notebook-preview">
-          <a
-            href="/assets/kedi-notebook-current.webp"
-            target="_blank"
-            rel="noopener"
-            aria-label="View full-size Kedi Notebook screenshot"
-          >
-            <img
-              src="/assets/kedi-notebook-current.webp"
-              width="2400"
-              height="1160"
-              alt="The current dark Kedi Notebook: one cell captures Istanbul and the Bosphorus; the next displays a sentence using both values."
-              loading="lazy"
-              decoding="async"
-            />
-            <span class="notebook-expand">
-              <Expand size={16} /> View full size
-            </span>
-          </a>
-          <figcaption>
-            <span>
-              <strong>[1]</strong> A template captures <code>city</code> and{' '}
-              <code>strait</code>.
-            </span>
-            <span>
-              <strong>[2]</strong> <code>&gt; show:</code> uses both values in
-              the next cell.
-            </span>
-          </figcaption>
-        </figure>
+        <NotebookPlayback />
         <div class="notebook-details">
           <div>
             <h3>Your Python, your choice.</h3>
@@ -176,29 +149,7 @@ const guide = 'https://docs.kedi-lang.org/tooling/notebook/';
             </p>
           </div>
         </div>
-        <figure class="notebook-preview repl-preview">
-          <a
-            href="/assets/kedi-repl.webp"
-            target="_blank"
-            rel="noopener"
-            aria-label="View full-size Kedi REPL screenshot"
-          >
-            <img
-              src="/assets/kedi-repl.webp"
-              width="1981"
-              height="794"
-              alt="A highlighted Kedi 0.2.0 terminal session captures Istanbul, then displays Cats love Istanbul."
-              loading="lazy"
-              decoding="async"
-            />
-            <span class="notebook-expand">
-              <Expand size={16} /> View full size
-            </span>
-          </a>
-          <figcaption>
-            A typed capture becomes a value you can use on the next line.
-          </figcaption>
-        </figure>
+        <ReplPlayback />
         <div class="notebook-details">
           <div>
             <h3>Start small. Keep going.</h3>

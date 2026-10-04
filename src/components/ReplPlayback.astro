@@ -1,0 +1,119 @@
+---
+import { Terminal, Play, Pause, RotateCcw, LoaderCircle } from '@lucide/astro';
+import session from '../data/repl-session.json';
+import { highlight } from '../lib/highlight';
+import { replDuration, formatReplTime } from '../lib/repl-timeline';
+
+const transcript = [
+  `$ ${session.command}`,
+  ...session.steps.flatMap((step) => [`+++ ${step.input}`, ...step.output]),
+  '+++',
+].join('\n');
+---
+
+<div class="repl-player" data-repl-player data-state="ready">
+  <div class="repl-titlebar">
+    <span>
+      <Terminal size={17} /> <code>{session.command}</code>
+    </span>
+    <span class="repl-recording">Recorded session</span>
+  </div>
+  <pre class="sr-only" aria-label="Recorded Kedi session">{transcript}</pre>
+  <div class="repl-screen" aria-hidden="true">
+    <div class="repl-welcome">
+      <pre>{' /\\_/\\\n( o.o )\n > ^ <'}</pre>
+      <div>
+        <strong>Kedi</strong>
+        <span>Interactive session</span>
+      </div>
+    </div>
+    <div class="repl-transcript">
+      {session.steps.map((step, index) => (
+        <div class="repl-step" data-repl-step={index}>
+          <div class="repl-input">
+            <span class="repl-prompt">+++</span>
+            <code
+              class="repl-line-content"
+              data-model-call={step.input.startsWith('>>') ? '' : undefined}
+            >
+              <span class="repl-measure">
+                {step.input + (step.input.startsWith('>>') ? '' : ' ')}
+              </span>
+              <span class="repl-live">
+                {highlight(step.input).map((token) => (
+                  <span
+                    data-repl-token
+                    class={token.kind ? `syntax-${token.kind}` : undefined}
+                  >
+                    {token.text}
+                  </span>
+                ))}
+                {step.input.startsWith('>>') && (
+                  <span class="repl-waiting" title="Recorded model call">
+                    <LoaderCircle size={14} stroke-dasharray="1 3" />
+                  </span>
+                )}
+              </span>
+            </code>
+          </div>
+          {step.output.map((line) => (
+            <div class="repl-output">{line}</div>
+          ))}
+        </div>
+      ))}
+      <div class="repl-final-prompt">
+        <span class="repl-prompt">+++</span>
+        <span class="repl-cursor"></span>
+      </div>
+    </div>
+  </div>
+  <div
+    class="repl-controls"
+    role="group"
+    aria-label="Recorded session playback"
+  >
+    <button
+      class="icon-button repl-toggle"
+      type="button"
+      data-repl-toggle
+      aria-label="Play recorded session"
+      data-tooltip="Play session"
+      disabled
+    >
+      <Play size={18} class="repl-play-icon" />
+      <Pause size={18} class="repl-pause-icon" />
+    </button>
+    <button
+      class="icon-button"
+      type="button"
+      data-repl-restart
+      aria-label="Restart recorded session"
+      data-tooltip="Restart"
+      disabled
+    >
+      <RotateCcw size={17} />
+    </button>
+    <input
+      type="range"
+      min="0"
+      max={replDuration}
+      step="100"
+      value={replDuration}
+      aria-label="Session playback position"
+      aria-valuetext={`${formatReplTime(replDuration)} of ${formatReplTime(replDuration)}`}
+      data-repl-seek
+      disabled
+    />
+    <span class="repl-clock">
+      <span data-repl-time>{formatReplTime(replDuration)}</span>
+      <span class="repl-clock-divider"> / </span>
+      {formatReplTime(replDuration)}
+    </span>
+  </div>
+  <span
+    class="sr-only"
+    role="status"
+    aria-live="polite"
+    data-repl-status
+  ></span>
+</div>

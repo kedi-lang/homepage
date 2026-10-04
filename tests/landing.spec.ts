@@ -77,6 +77,46 @@ test('brand mark has transparent negative space and an uncropped border', async 
   expect(favicon.hasAlpha).toBe(false);
 });
 
+test('upper extension cannot alter the original lower landscape', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await page.goto('/');
+  await page.evaluate(() => document.fonts.ready);
+  await page
+    .locator('.hero-landscape')
+    .evaluate((image: HTMLImageElement) => image.decode());
+  await page
+    .locator('.hero-sky')
+    .evaluate((image: HTMLImageElement) => image.decode());
+  await page.addStyleTag({
+    content:
+      '.hero-content, .cat-button, .location-note { visibility: hidden !important; }',
+  });
+  const withExtension = await page
+    .locator('.hero')
+    .screenshot({ animations: 'disabled', scale: 'css' });
+  await page.locator('.hero-sky').evaluate((image: HTMLElement) => {
+    image.style.visibility = 'hidden';
+  });
+  const originalOnly = await page
+    .locator('.hero')
+    .screenshot({ animations: 'disabled', scale: 'css' });
+  const metadata = await sharp(originalOnly).metadata();
+  const lowerHalf = {
+    left: 0,
+    top: Math.ceil(metadata.height! / 2),
+    width: metadata.width!,
+    height: Math.floor(metadata.height! / 2),
+  };
+  const actual = await sharp(withExtension).extract(lowerHalf).raw().toBuffer();
+  const expected = await sharp(originalOnly)
+    .extract(lowerHalf)
+    .raw()
+    .toBuffer();
+  expect(actual.equals(expected)).toBe(true);
+});
+
 for (const width of [320, 390, 768, 1440, 1920]) {
   test(`layout and assets at ${width}px`, async ({ page }, testInfo) => {
     const errors: string[] = [];
@@ -84,6 +124,50 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     await page.setViewportSize({ width, height: width <= 390 ? 844 : 900 });
     await page.goto('/');
     await page.evaluate(() => document.fonts.ready);
+    const landscape = page.locator('.hero-landscape');
+    await expect(landscape).toHaveAttribute('src', '/assets/istanbul.webp');
+    await expect(page.locator('.hero-sky')).toHaveAttribute(
+      'src',
+      '/assets/istanbul-extended.webp',
+    );
+    await landscape.evaluate((image: HTMLImageElement) => image.decode());
+    const imageSize = await landscape.evaluate((image: HTMLImageElement) => ({
+      width: image.getBoundingClientRect().width,
+      height: image.getBoundingClientRect().height,
+      naturalWidth: image.naturalWidth,
+      naturalHeight: image.naturalHeight,
+    }));
+    expect(imageSize.width).toBe(width);
+    expect(imageSize.width / imageSize.height).toBeCloseTo(
+      imageSize.naturalWidth / imageSize.naturalHeight,
+    );
+    const alignment = await page.evaluate(() => {
+      const landscape = document
+        .querySelector('.hero-landscape')!
+        .getBoundingClientRect();
+      const cat = document
+        .querySelector('.cat-button img')!
+        .getBoundingClientRect();
+      return {
+        paws: cat.top + (cat.height * 322) / 384,
+        ledge: landscape.top + (landscape.height * 894) / 948,
+      };
+    });
+    expect(Math.abs(alignment.paws - alignment.ledge)).toBeLessThan(2);
+    await expect(page.locator('.hero-landscape')).toHaveCSS(
+      'object-fit',
+      'contain',
+    );
+    await expect(page.locator('.hero-landscape')).toHaveCSS(
+      'object-position',
+      '50% 100%',
+    );
+    const toolSource = page.locator('.movie-tool-source');
+    await expect(toolSource).toHaveCSS(
+      'background-color',
+      'rgb(245, 246, 242)',
+    );
+    await expect(toolSource).toHaveCSS('color', 'rgb(32, 39, 34)');
     await expect(page).toHaveTitle(
       'Kedi - Program with natural language. Typed by design.',
     );
@@ -96,10 +180,10 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     await expect(page.locator('.site-header .brand span')).toHaveCount(0);
     await expect(page.locator('.site-footer .brand span')).toHaveText('kedi');
     await expect(
-      page.getByRole('heading', { name: 'kedi', exact: true }),
+      page.getByRole('heading', { name: 'Kedi', exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'kedi Harness', exact: true }),
+      page.getByRole('heading', { name: 'Kedi Harness', exact: true }),
     ).toBeVisible();
     await expect(page.locator('#agents-title')).toBeVisible();
     await expect(page.locator('#jev-title')).toBeVisible();
@@ -389,44 +473,14 @@ test('notebook launch and setup commands are copyable', async ({
   ).toHaveAttribute('href', 'https://docs.kedi-lang.org/tooling/notebook/');
 });
 
-for (const width of [320, 390, 768, 1440, 1920]) {
-  test(`interactive screenshots retain their proportions at ${width}px`, async ({
-    page,
-  }, testInfo) => {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto('/#notebook');
-    for (const [tab, asset, dimensions] of [
-      ['Notebook', 'kedi-notebook-current.webp', [2400, 1160]],
-      ['Terminal REPL', 'kedi-repl.webp', [1981, 794]],
-    ] as const) {
-      await page.getByRole('tab', { name: tab, exact: true }).click();
-      const preview = page.locator(
-        `.notebook-preview img[src="/assets/${asset}"]`,
-      );
-      await preview.scrollIntoViewIfNeeded();
-      await expect(preview).toBeVisible();
-      await expect(preview).toHaveJSProperty('naturalWidth', dimensions[0]);
-      await expect(preview).toHaveJSProperty('naturalHeight', dimensions[1]);
-      const size = await preview.boundingBox();
-      expect(size!.width / size!.height).toBeCloseTo(
-        dimensions[0] / dimensions[1],
-        2,
-      );
-      expect(size!.width).toBeLessThanOrEqual(width);
-      expect(
-        await page.evaluate(() => document.documentElement.scrollWidth),
-      ).toBeLessThanOrEqual(width);
-      const metadata = await sharp(`public/assets/${asset}`).metadata();
-      expect([metadata.width, metadata.height]).toEqual([...dimensions]);
-      if (width === 390 || width === 1440) {
-        await page.locator('#notebook').screenshot({
-          path: testInfo.outputPath(`${asset}-${width}.png`),
-          animations: 'disabled',
-        });
-      }
-    }
-  });
-}
+test('original notebook screenshot remains available at full resolution', async ({
+  request,
+}) => {
+  const response = await request.get('/assets/kedi-notebook-current.webp');
+  expect(response.ok()).toBeTruthy();
+  const metadata = await sharp(await response.body()).metadata();
+  expect([metadata.width, metadata.height]).toEqual([2400, 1160]);
+});
 
 test('REPL tab supports keyboard navigation and command copying', async ({
   page,
@@ -529,6 +583,19 @@ test('source remains readable without JavaScript', async ({
   await expect(
     page.locator('[data-demo="hero"] .value-result').first(),
   ).toHaveText('Hayao Miyazaki');
+  const notebook = page.locator('[data-notebook-player]');
+  await expect(notebook.locator('samp')).toHaveText(
+    'Istanbul spans the Bosphorus Strait.',
+  );
+  await expect(
+    notebook.getByRole('button', {
+      name: 'Play notebook session',
+      exact: true,
+    }),
+  ).toBeDisabled();
+  await expect(
+    notebook.getByRole('button', { name: 'Copy notebook cell 1' }),
+  ).toBeDisabled();
   await context.close();
 });
 

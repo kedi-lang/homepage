@@ -140,7 +140,7 @@
   },
   "jev": {
     "filename": "ticket_triage.kedi",
-    "code": "> import: decisions\n> model: typesafe/jev-latest\n\n[ticket] = I was charged twice. Reverse it or I cancel today.\n\n>> <ticket> belongs to [queue: Literal[\"billing\", \"technical\"]]. The probability the customer intends to cancel is [churn: Probability].\n\n= `{\"queue\": queue, \"priority\": churn >= 0.8}`",
+    "code": "> import: decisions\n> model: typesafe/jev-latest\n\n[ticket] = I was charged twice. Reverse it or I cancel today.\n\n>> <ticket> belongs to [queue: Literal[\"billing\", \"technical\"]]. The probability the customer intends to cancel is [churn: Probability].\n\n= `{\"queue\": queue, \"priority\": churn >= 0.80}`",
     "values": [
       {
         "name": "queue",

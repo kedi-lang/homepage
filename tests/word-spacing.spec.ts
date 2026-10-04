@@ -14,7 +14,7 @@ for (const width of [320, 390, 768, 1440]) {
         '#language .section-intro',
         'The context, the question, and the shape of the answer. All in the same line of your program.',
       ],
-      ['.section-aside h3', 'Not a string you have to untangle.'],
+      ['.capture-summary h3', 'Not a string you have to untangle.'],
       ['.claim-text', 'Does this API change need a migration?'],
       ['#compose-panel-python h3', 'A backtick away from Python.'],
     ];

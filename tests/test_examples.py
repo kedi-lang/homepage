@@ -1,6 +1,8 @@
 """Execute the displayed programs with deterministic model/SDK responses."""
 
+import io
 import json
+from contextlib import redirect_stdout
 from pathlib import Path
 
 import httpx
@@ -19,6 +21,8 @@ from typesafe_sdk import (
 from kedi.agent_adapter.adapters import PydanticAdapter
 from kedi.errors import KediExecutionError
 from kedi.lang import compile_program, parse_program
+from kedi.idle import IdleConsole
+from kedi.interactive_session import InteractiveSession
 from kedi_typesafe.integrations.pydantic import TypeSafeModel
 from tests.mock_adapter import AttrDict, MockAdapter
 
@@ -64,6 +68,33 @@ class ExampleAdapter(MockAdapter):
         self.calls.append(template)
         value = self.respond(template)
         return AttrDict(value) if isinstance(value, dict) else value
+
+
+def test_recorded_notebook_preserves_captures_between_cells():
+    recording = json.loads((WEBSITE / "src/data/notebook-session.json").read_text())
+    adapter = ExampleAdapter(lambda _: {"city": "Istanbul", "strait": "Bosphorus Strait"})
+    with InteractiveSession(adapter=adapter) as session:
+        for step in recording["steps"]:
+            output = io.StringIO()
+            with redirect_stdout(output):
+                session.execute(step["input"])
+            assert output.getvalue().splitlines() == step["output"]
+    assert len(adapter.calls) == 1
+
+
+def test_recorded_repl_transcript_uses_one_model_call():
+    recording = json.loads((WEBSITE / "src/data/repl-session.json").read_text())
+    adapter = ExampleAdapter(lambda _: {"city": "Istanbul"})
+    output, errors = io.StringIO(), io.StringIO()
+    with InteractiveSession(adapter=adapter) as session:
+        console = IdleConsole(session, stdout=output, stderr=errors, highlight=False)
+        for step in recording["steps"]:
+            console.push(step["input"])
+            assert output.getvalue().splitlines() == step["output"]
+            assert errors.getvalue() == ""
+            output.seek(0)
+            output.truncate()
+    assert len(adapter.calls) == 1
 
 
 @pytest.mark.parametrize(

@@ -1,9 +1,18 @@
 ---
-import { ArrowRight, ArrowUpRight } from '@lucide/astro';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  Minus,
+  RotateCcw,
+} from '@lucide/astro';
 import CodeWindow from './CodeWindow.astro';
 import examples from '../data/examples.json';
 
 const guide = 'https://docs.kedi-lang.org/agent-adapters/typesafe/';
+const probability = Number(
+  examples.jev.values.find((value) => value.name === 'churn')!.value,
+);
 ---
 
 <section id="jev" class="section jev-section" aria-labelledby="jev-title">
@@ -23,6 +32,90 @@ const guide = 'https://docs.kedi-lang.org/agent-adapters/typesafe/';
       Pick a queue. Assess cancellation intent. Let your program decide the
       priority.
     </p>
+    <div
+      class="showcase-layout decision-layout"
+      data-decision-demo
+      data-probability={probability}
+    >
+      <CodeWindow example={examples.jev} id="jev" />
+      <aside class="decision-controls" aria-label="Jev decision threshold">
+        <div class="assessment">
+          <span class="tiny-label">THE MODEL ASSESSES</span>
+          <div class="decision-label">
+            <span>Cancellation intent</span>
+            <strong>{probability.toFixed(2)}</strong>
+          </div>
+          <div
+            class="probability-rail"
+            style={`--probability: ${probability * 100}%`}
+            aria-hidden="true"
+          >
+            <span></span>
+          </div>
+          <div class="range-ticks" aria-hidden="true">
+            <span>0.00</span>
+            <span>0.25</span>
+            <span>0.50</span>
+            <span>0.75</span>
+            <span>1.00</span>
+          </div>
+        </div>
+        <div class="threshold-control">
+          <span class="tiny-label">YOUR PROGRAM DECIDES</span>
+          <div class="decision-label">
+            <label for="priority-threshold">Priority threshold</label>
+            <output for="priority-threshold" data-threshold-value>
+              0.80
+            </output>
+          </div>
+          <input
+            id="priority-threshold"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="80"
+            aria-valuetext="0.80"
+            style="--threshold: 80%"
+            disabled
+          />
+          <div class="range-ticks" aria-hidden="true">
+            <span>0.00</span>
+            <span>0.25</span>
+            <span>0.50</span>
+            <span>0.75</span>
+            <span>1.00</span>
+          </div>
+          <div class="decision-feedback" role="status" aria-atomic="true">
+            <code data-decision-comparison>
+              {probability.toFixed(2)} &gt;= 0.80
+            </code>
+            <div class="priority-result" data-priority="true">
+              <Check size={19} class="priority-yes" aria-hidden="true" />
+              <Minus size={19} class="priority-no" aria-hidden="true" />
+              <strong data-priority-result>priority: True</strong>
+            </div>
+          </div>
+          <div class="decision-meta">
+            <span>Additional model calls: 0</span>
+            <button
+              type="button"
+              class="icon-button"
+              data-reset-threshold
+              aria-label="Reset priority threshold"
+              data-tooltip="Reset threshold"
+              disabled
+            >
+              <RotateCcw size={15} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+        <p class="decision-disclaimer">
+          Illustrative values and threshold, not a calibrated policy or a
+          correctness guarantee.
+        </p>
+      </aside>
+    </div>
     <dl class="jev-primitives" aria-label="Jev primitives in Kedi">
       <div>
         <dt>Choice</dt>
@@ -37,28 +130,6 @@ const guide = 'https://docs.kedi-lang.org/agent-adapters/typesafe/';
         </dd>
       </div>
     </dl>
-    <div class="showcase-layout">
-      <CodeWindow example={examples.jev} id="jev" />
-      <aside
-        class="showcase-aside jev-aside"
-        aria-label="Jev decisions in Kedi"
-      >
-        <div class="decision-rule">
-          <span class="tiny-label">ONE REQUEST. TWO JUDGMENTS.</span>
-          <p>
-            <span>billing / priority</span>
-          </p>
-          <span class="decision-caption">
-            Jev selects the queue and assesses cancellation intent. Python
-            applies the 0.8 priority threshold without another model call.
-          </span>
-        </div>
-        <p class="aside-caption">
-          Illustrative values and threshold, not a calibrated policy or a
-          correctness guarantee.
-        </p>
-      </aside>
-    </div>
     <a class="text-link jev-guide" href={guide}>
       Explore the Jev integration <ArrowRight size={17} />
     </a>

@@ -49,53 +49,9 @@ mark {
   background: var(--yellow);
   color: #205238;
 }
-.anatomy-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-  margin: 30px 0 64px;
-}
-.anatomy-grid > div {
-  display: grid;
-  grid-template-columns: 29px 1fr;
-  gap: 8px 12px;
-}
-.anatomy-number {
-  font: 11px/1.8 var(--mono);
-  color: var(--green);
-}
-.anatomy-grid h3 {
-  font-size: 18px;
-  line-height: 1.4;
-}
-.anatomy-grid p {
-  grid-column: 2;
-  font-size: 14px;
-  color: var(--muted);
-}
-.anatomy-grid code {
-  font-size: 12px;
-  color: var(--ink);
-}
-.language-example {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  align-items: center;
-  gap: 75px;
-}
 .tiny-label {
   font: 10px/1.7 var(--mono);
   color: var(--green);
-}
-.section-aside h3 {
-  font-size: 30px;
-  line-height: 1.2;
-  margin-top: 13px;
-}
-.section-aside p {
-  color: var(--muted);
-  margin-top: 16px;
-  max-width: 300px;
 }
 .text-link {
   display: inline-flex;
@@ -109,9 +65,6 @@ mark {
 .text-link:hover {
   color: var(--green);
   border-color: var(--green);
-}
-.section-aside .text-link {
-  margin-top: 16px;
 }
 .conditions-section {
   background: #e7ece5;

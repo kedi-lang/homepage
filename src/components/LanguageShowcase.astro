@@ -1,0 +1,120 @@
+---
+import { ArrowRight, Braces, CornerDownRight } from '@lucide/astro';
+import CodeWindow from './CodeWindow.astro';
+import examples from '../data/examples.json';
+
+interface Props {
+  docs: string;
+}
+const { docs } = Astro.props;
+const note = examples.template.code
+  .split('\n')
+  .find((line) => line.startsWith('[note] = '))!
+  .slice('[note] = '.length);
+---
+
+<section
+  id="language"
+  class="section language-section"
+  aria-labelledby="language-title"
+  data-capture-demo
+  data-selection="output"
+>
+  <div class="container">
+    <div class="section-kicker">
+      <span>01 / THE LANGUAGE</span>
+      <span class="side-note">LESS GLUE. MORE MEANING.</span>
+    </div>
+    <h2 id="language-title">
+      From a sentence <br class="mobile-break" /> to a typed value.
+    </h2>
+    <p class="section-intro">
+      The context, the question, and the shape of the answer.{' '}
+      <br class="desktop-break" /> All in the same line of your program.
+    </p>
+    <div class="sentence-example" aria-label="Kedi template anatomy">
+      <code>
+        <span class="syntax-keyword">&gt;&gt;</span> The next action in{' '}
+        <button
+          type="button"
+          class="capture-token input-mark"
+          data-capture="input"
+          aria-pressed="false"
+          aria-controls="template-input"
+          aria-label="Inspect note input"
+          disabled
+        >
+          &lt;note&gt;
+        </button>{' '}
+        is{' '}
+        <button
+          type="button"
+          class="capture-token output-mark"
+          data-capture="output"
+          aria-pressed="true"
+          aria-controls="template-output"
+          aria-label="Inspect action capture"
+          disabled
+        >
+          [action: Action]
+        </button>
+        .
+      </code>
+    </div>
+    <div class="capture-input" id="template-input">
+      <span class="tiny-label">
+        INPUT / <code>note: str</code>
+      </span>
+      <p>{note}</p>
+    </div>
+    <div class="capture-layout">
+      <CodeWindow
+        example={examples.template}
+        id="template"
+        compact
+        showValues={false}
+      />
+      <aside
+        class="inspector-window capture-result"
+        id="template-output"
+        aria-label="Action capture values"
+      >
+        <div class="window-title">
+          <span class="filename">
+            <Braces size={17} aria-hidden="true" /> action{' '}
+            <span class="inspector-type">/ Action</span>
+          </span>
+          <CornerDownRight size={17} class="capture-arrow" aria-hidden="true" />
+        </div>
+        <div class="capture-result-body">
+          <dl class="capture-values">
+            {examples.template.values.map((value) => (
+              <div>
+                <dt>{value.name}</dt>
+                <dd class="value-type">{value.type}</dd>
+                <dd class="value-result">{value.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <div class="inspector-footer">
+          <span>BOUND VALUES</span>
+          <span class="example-label">Illustrative output</span>
+        </div>
+      </aside>
+    </div>
+    <div class="capture-summary">
+      <div>
+        <span class="tiny-label">SENTENCE IN. VALUE OUT.</span>
+        <h3>Not a string you have to untangle.</h3>
+        <p>
+          Use the result in the next statement, pass it to a procedure, or hand
+          it to Python.
+        </p>
+      </div>
+      <a class="text-link" href={`${docs}core-language/templates-and-invokes/`}>
+        Explore templates <ArrowRight size={17} />
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,142 @@
+.scope-layout {
+  align-items: stretch;
+}
+.scope-layout > .code-window {
+  display: flex;
+  flex-direction: column;
+}
+.scope-layout .code-body {
+  flex: 1;
+}
+.scope-body {
+  background: var(--white);
+  border: 1px solid #9aa69b;
+  border-bottom: 0;
+  padding: 18px;
+}
+.scope-tree,
+.scope-tree ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.scope-tree ul {
+  margin-left: 12px;
+  padding-left: 15px;
+  border-left: 1px dotted #a6b3a8;
+}
+.scope-tree li {
+  position: relative;
+}
+.scope-tree ul > li::before {
+  content: '';
+  position: absolute;
+  left: -15px;
+  top: 22px;
+  width: 14px;
+  border-top: 1px dotted #a6b3a8;
+}
+.scope-tree button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+  padding: 9px 8px;
+  border: 1px solid transparent;
+  background: none;
+  border-radius: 2px;
+  font: 12px/1.6 var(--mono);
+  overflow-wrap: anywhere;
+}
+.scope-tree button svg,
+.scope-details svg {
+  flex-shrink: 0;
+  color: var(--green-dark);
+}
+.scope-tree button[aria-pressed='true'] {
+  background: #e5ecdf;
+  border-color: #68806b;
+}
+.scope-tree button:not(:disabled):hover {
+  background: #edf1e7;
+}
+.scope-kind {
+  font: 9px/1.4 var(--sans);
+  color: var(--muted);
+  margin-left: auto;
+}
+.scope-details {
+  display: grid;
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.scope-details dl {
+  grid-area: 1 / 1;
+  margin: 0;
+}
+/* Reserve the tallest detail view so selection never shifts the page. */
+.scope-details dl[hidden] {
+  display: block !important;
+  visibility: hidden;
+}
+.scope-details dl > div {
+  padding: 15px 4px;
+  border-bottom: 1px solid var(--line);
+}
+.scope-details dl > div:last-child {
+  border-bottom: 0;
+}
+.scope-details dt {
+  font: 10px/1.5 var(--mono);
+  color: var(--green);
+  margin-bottom: 7px;
+}
+.scope-details dd {
+  display: flex;
+  align-items: start;
+  gap: 9px;
+  font-size: 13px;
+  line-height: 1.7;
+  min-width: 0;
+}
+.scope-details dd svg {
+  margin-top: 3px;
+}
+.scope-details code {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.code-line.is-inspected {
+  background: #e7eddf;
+  box-shadow: inset 3px 0 var(--green);
+}
+@media (max-width: 1000px) {
+  .scope-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+  }
+  .scope-details {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+    margin: 0;
+    padding-left: 24px;
+  }
+}
+@media (max-width: 680px) {
+  .scope-body {
+    display: block;
+    padding: 13px;
+  }
+  .scope-details {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    margin-top: 16px;
+    padding-left: 0;
+  }
+  .scope-kind {
+    display: none;
+  }
+}

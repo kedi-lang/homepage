@@ -56,19 +56,44 @@ artifact. Only the built `dist/` directory is a publishable website output.
   `Probability` share one request. Python applies the priority rule locally.
   The threshold is illustrative application policy, not a calibration result.
 - Kedi Harness teaser explicitly marked coming soon.
-- An interactive section with Notebook and Terminal REPL tabs, current screenshots, `kedi notebook` launch
+- An interactive section with Notebook and Terminal REPL playback, `kedi notebook` launch
   command, source-checkout setup, and cell-to-cell state example.
 - Discord community links in the main and footer navigation.
 - Installation command switching/copying and an animated Bosphorus ferry.
 - Responsive layouts, keyboard-operated tabs/menu, and reduced-motion support.
 
-The interactive section uses a capture of the current notebook after executing
-two cells, plus the approved REPL image from the Kedi README. Both images retain
-their native proportions, link to the full-size asset, and use lossless WebP.
+The notebook tab replays the two cells in `src/data/notebook-session.json` in a
+compact dark editor with the Kedi logo. The transcript was verified on 2026-10-04
+using `InteractiveSession`, the Pydantic adapter, and a real
+`openrouter:openai/gpt-6-luna` request. Cell one captures `Istanbul` and
+`Bosphorus Strait`; cell two prints `Istanbul spans the Bosphorus Strait.`.
+The displayed model omits the recording's OpenRouter prefix, as in the REPL.
+Each cell can restart playback from its position in the recorded sequence.
+Cell copy buttons always copy the complete source, including during playback.
+If clipboard permission is denied, a selected read-only source field allows
+manual copying. Touch controls have larger targets without changing desktop spacing.
+The titlebar also links to the original full-size, lossless WebP screenshot.
 The notebook uses `> show:` to read captures across cells; the REPL command is
 `kedi --idle`, with highlighting enabled by default and `--no-color` to disable it.
 
-The replayable code examples use curated **illustrative output**, not live model calls
+The terminal tab plays the transcript in `src/data/repl-session.json`, verified
+on 2026-10-04 using Kedi's `IdleConsole`, `InteractiveSession`, and Pydantic
+adapter with a real `openrouter:openai/gpt-6-luna` request. The displayed model
+line is shortened to `> model: openai/gpt-6-luna`, omitting the recording's
+OpenRouter prefix. The capture resolves
+to `Istanbul`; the two following `> show:` commands print the recorded outputs.
+The open-ended "city of cats" prompt does not uniquely identify a city; different
+models or runs may choose another answer.
+The website replays stored text only. Typing and pauses are paced for readability,
+not a recording of wall-clock latency. Playback starts only on request and does
+not loop. Both players can be paused, restarted, or scrubbed; hiding their tab, leaving
+the browser tab, or pausing page motion stops it. Reduced motion reveals whole
+lines rather than typing them character by character. A complete transcript is
+available to screen readers without announcing every typed character.
+A small dotted spinner marks the recorded template-call wait; it freezes when
+paused and remains static with reduced motion enabled.
+
+The other replayable code examples use curated **illustrative output**, not live model calls
 or measured recordings. Replay is visual playback only. There are no model
 latency, accuracy, or cost claims. The examples are stored in
 `src/data/examples.json`; rendered code and clipboard text share that source.
@@ -76,7 +101,6 @@ Only the introductory movie example has explanatory comments. The hero imports t
 tool from `public/examples/tmdb.kedi`, linked beneath the example. This is a local
 example module, not a built-in Kedi package; it must sit alongside `movie_night.kedi`.
 The copy button copies the displayed main program.
-Real workflow recordings can replace this illustrative presentation later.
 
 The header, footer, and favicon use the supplied monochrome Kedi emblem.
 Its original JPEG and reproducible transparent extraction are in `assets/source/`.

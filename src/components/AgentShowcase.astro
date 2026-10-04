@@ -1,5 +1,14 @@
 ---
-import { ArrowRight, FileText, Search, PencilLine } from '@lucide/astro';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Download,
+  FileText,
+  FolderOpen,
+  PanelsTopLeft,
+  Search,
+  Code,
+} from '@lucide/astro';
 import CodeWindow from './CodeWindow.astro';
 import examples from '../data/examples.json';
 
@@ -24,48 +33,175 @@ const { docs } = Astro.props;
       A researcher finds the breaking change. An editor explains the migration.
       Profiles, tools, subagents, and typed answers, in the same program.
     </p>
-    <div class="showcase-layout">
+    <div class="showcase-layout scope-layout" data-scope-demo>
       <CodeWindow example={examples.agent} id="agent" />
-      <aside class="showcase-aside" aria-label="Release team roles">
-        <ol class="workflow-steps">
-          <li>
-            <FileText size={21} aria-hidden="true" />
-            <div>
-              <span class="tiny-label">THE SOURCE</span>
-              <h3>A file, not a guess.</h3>
-              <p>The researcher reads your changelog with Kedi's file tool.</p>
-              <a class="text-link" href="/examples/CHANGELOG.md">
-                Example changelog <ArrowRight size={15} />
-              </a>
-            </div>
-          </li>
-          <li>
-            <Search size={21} aria-hidden="true" />
-            <div>
-              <span class="tiny-label">THE RESEARCHER</span>
-              <h3>A focused job.</h3>
-              <p>
-                Its own instructions and file access. A typed{' '}
-                <code>list[str]</code> result.
-              </p>
-            </div>
-          </li>
-          <li>
-            <PencilLine size={21} aria-hidden="true" />
-            <div>
-              <span class="tiny-label">THE EDITOR</span>
-              <h3>The final word.</h3>
-              <p>
-                Delegates the research, then turns the findings into a typed
-                migration checklist.
-              </p>
-            </div>
-          </li>
-        </ol>
-        <a class="text-link" href={`${docs}agentic-engineering/subagents/`}>
-          Explore subagents <ArrowRight size={17} />
-        </a>
+      <aside
+        class="inspector-window scope-inspector"
+        aria-label="Scope inspector"
+      >
+        <div class="window-title">
+          <span class="filename">
+            <PanelsTopLeft size={17} aria-hidden="true" /> Scope inspector
+          </span>
+          <a
+            class="icon-button"
+            href="/examples/release_team.kedi"
+            download="release_team.kedi"
+            aria-label="Download release team source"
+            data-tooltip="Download source"
+          >
+            <Download size={16} aria-hidden="true" />
+          </a>
+        </div>
+        <div class="scope-body">
+          <nav aria-label="Agent scopes">
+            <ul class="scope-tree">
+              <li>
+                <button
+                  type="button"
+                  data-scope="editor"
+                  data-lines="9,10,12,13"
+                  aria-pressed="false"
+                  aria-controls="scope-editor"
+                  disabled
+                >
+                  <FolderOpen size={17} aria-hidden="true" />{' '}
+                  <span>editor</span>
+                  <span class="scope-kind">profile</span>
+                </button>
+                <ul>
+                  <li>
+                    <button
+                      type="button"
+                      data-scope="researcher"
+                      data-lines="4,5,6,7"
+                      aria-pressed="true"
+                      aria-controls="scope-researcher"
+                      disabled
+                    >
+                      <Search size={17} aria-hidden="true" />{' '}
+                      <span>researcher</span>
+                      <span class="scope-kind">profile</span>
+                    </button>
+                    <ul>
+                      <li>
+                        <button
+                          type="button"
+                          data-scope="file"
+                          data-lines="1,6"
+                          aria-pressed="false"
+                          aria-controls="scope-file"
+                          disabled
+                        >
+                          <FileText size={17} aria-hidden="true" />
+                          <span>read_text_file</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+          <div class="scope-details" aria-live="polite" aria-atomic="true">
+            <dl id="scope-researcher" data-scope-panel="researcher">
+              <div>
+                <dt>PROFILE</dt>
+                <dd>
+                  <code>researcher</code>
+                </dd>
+              </div>
+              <div>
+                <dt>INSTRUCTIONS</dt>
+                <dd>
+                  Read CHANGELOG.md.
+                  <br />
+                  Find required v2.0 migrations.
+                </dd>
+              </div>
+              <div>
+                <dt>TOOLS</dt>
+                <dd>
+                  <FileText size={15} aria-hidden="true" />
+                  <code>read_text_file</code>
+                </dd>
+              </div>
+              <div>
+                <dt>OUTPUT</dt>
+                <dd>
+                  <code>list[str]</code>
+                </dd>
+              </div>
+            </dl>
+            <dl id="scope-editor" data-scope-panel="editor" hidden>
+              <div>
+                <dt>PROFILE</dt>
+                <dd>
+                  <code>editor</code>
+                </dd>
+              </div>
+              <div>
+                <dt>SUBAGENTS</dt>
+                <dd>
+                  <Search size={15} aria-hidden="true" />
+                  <code>researcher</code>
+                </dd>
+              </div>
+              <div>
+                <dt>TOOLS</dt>
+                <dd>
+                  No direct file tool. Delegates research to its subagent.
+                </dd>
+              </div>
+              <div>
+                <dt>CAPTURE AT THE CALL SITE</dt>
+                <dd>
+                  <code>steps: list[str]</code>
+                </dd>
+              </div>
+            </dl>
+            <dl id="scope-file" data-scope-panel="file" hidden>
+              <div>
+                <dt>TOOL</dt>
+                <dd>
+                  <code>read_text_file</code>
+                </dd>
+              </div>
+              <div>
+                <dt>IMPORTED FROM</dt>
+                <dd>
+                  <Code size={15} aria-hidden="true" />
+                  <code>filesystem</code>
+                </dd>
+              </div>
+              <div>
+                <dt>BOUND IN</dt>
+                <dd>
+                  <code>researcher</code>
+                </dd>
+              </div>
+              <div>
+                <dt>RETURNS</dt>
+                <dd>
+                  <code>str</code>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        <div class="inspector-footer">
+          <span>LEXICAL SCOPE</span>
+          <a href="/examples/CHANGELOG.md">
+            Example changelog <ArrowUpRight size={12} aria-hidden="true" />
+          </a>
+        </div>
       </aside>
     </div>
+    <a
+      class="text-link showcase-guide"
+      href={`${docs}agentic-engineering/subagents/`}
+    >
+      Explore subagents <ArrowRight size={17} />
+    </a>
   </div>
 </section>

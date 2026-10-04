@@ -16,6 +16,7 @@ import Brand from '../components/Brand.astro';
 import Tabs from '../components/Tabs.astro';
 import Install from '../components/Install.astro';
 import AgentShowcase from '../components/AgentShowcase.astro';
+import LanguageShowcase from '../components/LanguageShowcase.astro';
 import JevShowcase from '../components/JevShowcase.astro';
 import NotebookShowcase from '../components/NotebookShowcase.astro';
 import Team from '../components/Team.astro';
@@ -52,6 +53,7 @@ const discord = 'https://discord.gg/cuSbZd5he';
     <link rel="canonical" href="https://kedi-lang.org/" />
     <title>Kedi - Program with natural language. Typed by design.</title>
     <link rel="icon" href="/assets/kedi-favicon.webp" type="image/webp" />
+    <link rel="preload" as="image" href="/assets/istanbul-extended.webp" />
     <link rel="preload" as="image" href="/assets/istanbul.webp" />
   </head>
   <body>
@@ -79,7 +81,7 @@ const discord = 'https://discord.gg/cuSbZd5he';
         <nav id="site-nav" aria-label="Main navigation">
           <a href={docs}>Documentation</a>
           <a href="#language">The language</a>
-          <a href="#jev">kedi + Jev</a>
+          <a href="#jev">Kedi + Jev</a>
           <a href={discord}>
             Discord <ArrowUpRight size={14} />
           </a>
@@ -96,6 +98,14 @@ const discord = 'https://discord.gg/cuSbZd5he';
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
         <img
+          class="hero-sky"
+          src="/assets/istanbul-extended.webp"
+          width="1448"
+          height="1086"
+          alt=""
+          fetchpriority="high"
+        />
+        <img
           class="hero-landscape"
           src="/assets/istanbul.webp"
           width="1660"
@@ -105,7 +115,7 @@ const discord = 'https://discord.gg/cuSbZd5he';
         />
         <div class="hero-content">
           <span class="eyebrow hero-eyebrow">A PROGRAMMING LANGUAGE</span>
-          <h1 id="hero-title">kedi</h1>
+          <h1 id="hero-title">Kedi</h1>
           <p class="hero-statement">
             Program with natural language.
             <br />
@@ -120,96 +130,26 @@ const discord = 'https://discord.gg/cuSbZd5he';
             <a class="text-link movie-tool-source" href="/examples/tmdb.kedi">
               tmdb.kedi · Tool source <ArrowUpRight size={14} />
             </a>
-            <button
-              class="cat-button"
-              type="button"
-              aria-label="Say hello to the Istanbul cat"
-              data-tooltip="Meow!"
-            >
-              <img
-                src="/assets/cat.webp"
-                width="160"
-                height="194"
-                alt="A tuxedo Istanbul cat with a yellow collar"
-              />
-            </button>
           </div>
           <Install />
         </div>
+        <button
+          class="cat-button"
+          type="button"
+          aria-label="Say hello to the Istanbul cat"
+          data-tooltip="Meow!"
+        >
+          <img
+            src="/assets/cat.webp"
+            width="160"
+            height="192"
+            alt="A tuxedo Istanbul cat with a yellow collar"
+          />
+        </button>
         <span class="location-note">41.0082° N / 28.9784° E</span>
       </section>
 
-      <section
-        id="language"
-        class="section language-section"
-        aria-labelledby="language-title"
-      >
-        <div class="container">
-          <div class="section-kicker">
-            <span>01 / THE LANGUAGE</span>
-            <span class="side-note">LESS GLUE. MORE MEANING.</span>
-          </div>
-          <h2 id="language-title">
-            From a sentence <br class="mobile-break" /> to a typed value.
-          </h2>
-          <p class="section-intro">
-            The context, the question, and the shape of the answer.{' '}
-            <br class="desktop-break" /> All in the same line of your program.
-          </p>
-          <div class="sentence-example" aria-label="Kedi template anatomy">
-            <code>
-              <span class="syntax-keyword">&gt;&gt;</span> The next action in{' '}
-              <mark class="input-mark">&lt;note&gt;</mark> is{' '}
-              <mark class="output-mark">[action: Action]</mark>.
-            </code>
-          </div>
-          <div class="anatomy-grid">
-            <div>
-              <span class="anatomy-number">01</span>
-              <h3>Your context</h3>
-              <p>
-                <code>&lt;note&gt;</code> brings an existing value into the
-                sentence.
-              </p>
-            </div>
-            <div>
-              <span class="anatomy-number">02</span>
-              <h3>Your words</h3>
-              <p>
-                The natural-language template describes what you want to know.
-              </p>
-            </div>
-            <div>
-              <span class="anatomy-number">03</span>
-              <h3>A real value</h3>
-              <p>
-                <code>[action: Action]</code> binds a record with an owner,
-                task, and blocked state.
-              </p>
-            </div>
-          </div>
-          <div class="language-example">
-            <div class="section-aside">
-              <span class="tiny-label">SENTENCE IN. VALUE OUT.</span>
-              <h3>
-                Not a string <br />
-                you have to untangle.
-              </h3>
-              <p>
-                Use the result in the next statement, pass it to a procedure, or
-                hand it to Python.
-              </p>
-              <a
-                class="text-link"
-                href={`${docs}core-language/templates-and-invokes/`}
-              >
-                Explore templates <ArrowRight size={17} />
-              </a>
-            </div>
-            <CodeWindow example={examples.template} id="template" compact />
-          </div>
-        </div>
-      </section>
+      <LanguageShowcase docs={docs} />
 
       <section
         id="conditions"
@@ -458,7 +398,7 @@ const discord = 'https://discord.gg/cuSbZd5he';
             </span>
             <span>
               <Code size={17} />
-              Pluggable model adapters
+              Pluggable agent adapters
             </span>
           </div>
         </div>
@@ -476,7 +416,7 @@ const discord = 'https://discord.gg/cuSbZd5he';
         <div class="container harness-layout">
           <div class="harness-copy">
             <span class="eyebrow coming-soon">COMING SOON</span>
-            <h2 id="harness-title">kedi Harness</h2>
+            <h2 id="harness-title">Kedi Harness</h2>
             <p class="harness-statement">
               An agent harness.
               <br />
