@@ -180,7 +180,7 @@ for (const width of [320, 390, 768, 1440, 1920]) {
     await expect(page.locator('.site-header .brand span')).toHaveCount(0);
     await expect(page.locator('.site-footer .brand span')).toHaveText('kedi');
     await expect(
-      page.getByRole('heading', { name: 'Kedi', exact: true }),
+      page.getByRole('heading', { name: 'kedi', exact: true }),
     ).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Kedi Harness', exact: true }),
