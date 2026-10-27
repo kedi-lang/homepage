@@ -40,7 +40,7 @@ def run_example(name, adapter):
     return compile_program(
         parse_program(
             EXAMPLES[name]["code"],
-            source_path=str(WEBSITE / "public/examples" / EXAMPLES[name]["filename"]),
+            source_path=str(WEBSITE / "tests/fixtures" / EXAMPLES[name]["filename"]),
         ),
         adapter=adapter,
         loop_iteration_limit=3,
@@ -52,7 +52,7 @@ def test_examples_compile(name):
     compile_program(
         parse_program(
             EXAMPLES[name]["code"],
-            source_path=str(WEBSITE / "public/examples" / EXAMPLES[name]["filename"]),
+            source_path=str(WEBSITE / "tests/fixtures" / EXAMPLES[name]["filename"]),
         ),
         adapter=MockAdapter(),
     )
@@ -186,7 +186,7 @@ def test_movie_tool_propagates_http_errors(monkeypatch, failure, stage):
     )
     with pytest.raises(KediExecutionError) as error:
         compile_program(
-            parse_program(source, source_path=str(WEBSITE / "public/examples/movie_night.kedi")),
+            parse_program(source, source_path=str(WEBSITE / "tests/fixtures/movie_night.kedi")),
             adapter=MockAdapter(),
         ).run_main()
     assert "test-tmdb-token" not in str(error.value)
@@ -229,7 +229,7 @@ def test_movie_lookup_does_not_guess_when_search_is_inconclusive(
     source = '> import: tmdb\n= <movie_details(`"Dune"`)>'
     with pytest.raises(KediExecutionError, match=message):
         compile_program(
-            parse_program(source, source_path=str(WEBSITE / "public/examples/movie_night.kedi")),
+            parse_program(source, source_path=str(WEBSITE / "tests/fixtures/movie_night.kedi")),
             adapter=MockAdapter(),
         ).run_main()
 
@@ -262,7 +262,7 @@ def test_movie_lookup_can_disambiguate_by_year(monkeypatch):
     )
     source = '> import: tmdb\n= `movie_details("Dune", 1984)`'
     result = compile_program(
-        parse_program(source, source_path=str(WEBSITE / "public/examples/movie_night.kedi")),
+        parse_program(source, source_path=str(WEBSITE / "tests/fixtures/movie_night.kedi")),
         adapter=MockAdapter(),
     ).run_main()
     assert result["directors"] == ["David Lynch"]
@@ -271,9 +271,13 @@ def test_movie_lookup_can_disambiguate_by_year(monkeypatch):
 
 @pytest.mark.parametrize("claim", [True, False])
 def test_condition_updates_outer_binding(claim):
-    assert run_example("condition", ExampleAdapter(lambda _: claim)) == (
-        "migration" if claim else "standard"
+    adapter = ExampleAdapter(lambda _: claim)
+    assert run_example("condition", adapter) == ("migration" if claim else "standard")
+    assert (
+        'The API change "The response field user_id is being replaced by account_id."'
+        in adapter.calls[0]
     )
+    assert "breaks compatibility with existing clients" in adapter.calls[0]
 
 
 def test_loop_rechecks_revised_value():
@@ -301,19 +305,29 @@ def test_map_uses_each_iterations_own_fields():
     assert len(adapter.calls) == 2
 
 
-@pytest.mark.parametrize(
-    ("name", "fields"),
-    [
-        ("template", {"action": {"owner": "Mira", "task": "Fix checkout", "blocked": True}}),
-        ("procedure", {"brief": {"problem": "Coupon timeout", "next_step": "Reproduce it"}}),
-    ],
-)
-def test_record_outputs_and_procedure_returns(name, fields):
+def test_next_action_is_a_typed_record():
+    fields = {"owner": "design team", "task": "send the event poster to the printer"}
+
+    def respond(messages, info):
+        assert set(info.output_tools[0].parameters_json_schema["properties"]) == {"action"}
+        return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, {"action": fields})])
+
+    result = run_example("template", PydanticAdapter(FunctionModel(respond)))
+    assert result.model_dump() == fields
+    assert {
+        value["name"].removeprefix("action."): value["value"]
+        for value in EXAMPLES["template"]["values"]
+    } == fields
+
+
+def test_record_output_survives_procedure_return():
+    fields = {"brief": {"problem": "Coupon timeout", "next_step": "Reproduce it"}}
+
     def respond(messages, info):
         return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, fields)])
 
-    result = run_example(name, PydanticAdapter(FunctionModel(respond)))
-    assert result.model_dump() == next(iter(fields.values()))
+    result = run_example("procedure", PydanticAdapter(FunctionModel(respond)))
+    assert result.model_dump() == fields["brief"]
 
 
 class JevClient:
@@ -337,6 +351,10 @@ class JevClient:
                 )
             else:
                 assert isinstance(question, Noul)
+                assert (
+                    question.instructions
+                    == "The customer states an intention to cancel their subscription."
+                )
                 answers[key] = NoulAnswer(noul=self.probability)
         return SystemOneResponse(
             model="jev-test", usage=Usage(input_tokens=12, output_tokens=2), answers=answers
@@ -387,9 +405,8 @@ def test_stock_tool_reads_supplied_fixture(monkeypatch):
         if not returns:
             return ModelResponse(parts=[ToolCallPart("stock", {"item": "field-notebook"})])
         assert returns[-1].content == 3
-        return ModelResponse(
-            parts=[ToolCallPart(info.output_tools[0].name, {"remaining": 3, "can_fulfill": False})]
-        )
+        assert set(info.output_tools[0].parameters_json_schema["properties"]) == {"remaining"}
+        return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, {"remaining": 3})])
 
     assert run_example("tool", PydanticAdapter(FunctionModel(respond))) is False
     assert len(calls) == 2
@@ -398,6 +415,7 @@ def test_stock_tool_reads_supplied_fixture(monkeypatch):
 def test_release_team_delegates_and_reads_changelog(monkeypatch):
     monkeypatch.chdir(WEBSITE / "public/examples")
     calls = []
+    findings = ["API responses now use account_id instead of user_id."]
     steps = ["Read account_id instead of user_id in API responses"]
 
     def respond(messages, info):
@@ -425,12 +443,14 @@ def test_release_team_delegates_and_reads_changelog(monkeypatch):
                 ]
             )
         assert "account_id" in str(returns[-1].content)
+        if parent:
+            assert findings[0] in str(returns[-1].content)
         fields = (
             {"steps": steps}
             if parent
             else {
-                "task_summary": "Read v2.0 and identified the API migration.",
-                "final_result": steps,
+                "task_summary": "Read v2.0 and quoted the breaking change.",
+                "final_result": findings,
             }
         )
         return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, fields)])

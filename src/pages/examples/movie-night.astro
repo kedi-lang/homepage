@@ -1,0 +1,201 @@
+---
+import { ArrowLeft, ArrowUpRight, Download } from '@lucide/astro';
+import examples from '../../data/examples.json';
+import { highlight } from '../../lib/highlight';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '../../styles/global.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Run the Kedi movie example with a TMDB lookup tool and typed captures."
+    />
+    <title>Movie night example - Kedi</title>
+    <link rel="icon" href="/assets/kedi-favicon.webp" type="image/webp" />
+  </head>
+  <body>
+    <header class="guide-header">
+      <a href="/" aria-label="kedi home" class="brand">
+        <img
+          class="brand-logo"
+          src="/assets/kedi-logo.svg"
+          width="64"
+          height="44"
+          alt=""
+        />
+        <span>kedi</span>
+      </a>
+      <a class="text-link" href="/">
+        <ArrowLeft size={16} /> Back to the homepage
+      </a>
+    </header>
+    <main class="example-guide">
+      <h1>Movie night</h1>
+      <p class="guide-intro">
+        Find a film by name, call TMDB through a tool, and capture its director,
+        release year, and runtime as typed values.
+      </p>
+      <section aria-labelledby="files-title">
+        <h2 id="files-title">1. Get the program</h2>
+        <p>
+          Download the program below. Its movie lookup tool is supplied by the
+          <a href="https://registry.kedi-lang.org/package/tmdb">
+            tmdb registry package
+          </a>
+          .
+        </p>
+        <div class="downloads">
+          <a class="text-link" href="/examples/movie_night.kedi" download>
+            <Download size={16} /> movie_night.kedi
+          </a>
+        </div>
+      </section>
+      <section aria-labelledby="setup-title">
+        <h2 id="setup-title">2. Prepare the environment</h2>
+        <p>
+          Use Python 3.11 or newer. Until the next PyPI release, install Kedi
+          from its stable branch. These commands create a separate environment
+          on macOS or Linux:
+        </p>
+        <pre><code>uv venv --python 3.12
+source .venv/bin/activate
+uv pip install 'kedi @ git+https://github.com/kedi-lang/kedi@stable' 'pydantic-ai-slim[google]'
+kedi add tmdb</code></pre>
+        <p>
+          <code>kedi add tmdb</code> installs the verified package and its
+          <code>httpx</code> dependency into this environment.
+        </p>
+        <p>
+          For other installation options, see the
+          <a href="https://docs.kedi-lang.org/getting-started/installation/">
+            installation guide
+          </a>
+          .
+        </p>
+        <p>
+          <a href="https://registry.kedi-lang.org/package/tmdb">Install tmdb</a>
+          from the registry with <code>kedi add tmdb</code>.
+        </p>
+      </section>
+      <section aria-labelledby="keys-title">
+        <h2 id="keys-title">3. Configure your keys</h2>
+        <p>
+          In that directory, create a local <code>.env</code> with your Google
+          API key and your TMDB <strong>API Read Access Token</strong>. The TMDB
+          token is sent as a Bearer header; it is not the shorter API key.
+        </p>
+        <pre><code>GOOGLE_API_KEY=your-google-api-key
+TMDB_API_KEY=your-tmdb-read-access-token</code></pre>
+        <p>
+          Keep <code>.env</code> out of version control. The keys are used by
+          your local program, never by this website.
+          <a href="https://developer.themoviedb.org/docs/getting-started">
+            TMDB setup <ArrowUpRight size={13} />
+          </a>
+        </p>
+      </section>
+      <section aria-labelledby="run-title">
+        <h2 id="run-title">4. Run the program</h2>
+        <pre><code>kedi movie_night.kedi --adapter-model google/gemini-3-flash-preview</code></pre>
+        <p>
+          The model can call <code>movie_details</code> to search for the title
+          and read its details. The template binds three values; the final
+          statement returns the director. Model and TMDB requests use your
+          accounts.
+        </p>
+        <div class="code-body">
+          <pre><code>{examples.hello.code.split('\n').map(line => <span class="guide-code-line">{highlight(line).map(token => <span class={token.kind ? `syntax-${token.kind}` : undefined}>{token.text}</span>)}{'\n'}</span>)}</code></pre>
+        </div>
+        <p>
+          For a remake or an ambiguous title, include its release year in the
+          template. The tool accepts a year and rejects ambiguous matches.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  .guide-header,
+  .example-guide {
+    width: min(820px, calc(100% - 40px));
+    margin-inline: auto;
+  }
+  .guide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-block: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .example-guide {
+    padding-block: 48px 80px;
+  }
+  h1 {
+    font-size: 42px;
+  }
+  .guide-intro {
+    margin-top: 18px;
+    font-size: 18px;
+    color: var(--muted);
+  }
+  section {
+    margin-top: 38px;
+  }
+  h2 {
+    font-size: 22px;
+    text-wrap: initial;
+  }
+  p {
+    margin-top: 16px;
+  }
+  p a {
+    color: var(--green-dark);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  p svg {
+    display: inline;
+    vertical-align: middle;
+  }
+  pre {
+    margin-top: 18px;
+    padding: 18px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .downloads {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+    margin-top: 18px;
+  }
+  .code-body {
+    margin-top: 20px;
+  }
+  .code-body pre {
+    margin: 0;
+    border: 0;
+  }
+  .guide-code-line {
+    white-space: pre-wrap;
+  }
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 34px;
+    }
+    .example-guide {
+      padding-top: 32px;
+    }
+  }
+</style>

@@ -82,7 +82,7 @@ export function initDecisionDemo() {
   )!;
   const source = demo.querySelector<HTMLTextAreaElement>('.copy-source')!;
   const original = source.value;
-  const marker = 'churn >= 0.80';
+  const marker = 'cancellation_intent >= 0.80';
   const sourceLines = original.split('\n');
   const lineIndex = sourceLines.findIndex((line) => line.includes(marker));
   const codeLine = demo.querySelector<HTMLElement>(
@@ -111,10 +111,13 @@ export function initDecisionDemo() {
     result.textContent = `priority: ${priority ? 'True' : 'False'}`;
     resultRow.dataset.priority = String(priority);
     reset.disabled = slider.value === slider.defaultValue;
-    source.value = original.replace(marker, `churn >= ${formatted}`);
+    source.value = original.replace(
+      marker,
+      `cancellation_intent >= ${formatted}`,
+    );
     const updatedLine = sourceLines[lineIndex].replace(
       marker,
-      `churn >= ${formatted}`,
+      `cancellation_intent >= ${formatted}`,
     );
     codeLine.replaceChildren(
       ...highlight(updatedLine).map((token) => {

@@ -22,28 +22,23 @@
   },
   "template": {
     "filename": "next_action.kedi",
-    "code": "~Action(owner: str, task: str, blocked: bool)\n\n[note] = QA must reproduce the timeout before Mira can fix checkout.\n>> The next action in <note> is [action: Action].\n\n= `action`",
+    "code": "~Action(owner: str, task: str)\n\n[note] = The design team will send the event poster to the printer.\n>> The next action in <note> is [action: Action].\n\n= `action`",
     "values": [
       {
         "name": "action.owner",
         "type": "str",
-        "value": "Mira"
+        "value": "design team"
       },
       {
         "name": "action.task",
         "type": "str",
-        "value": "Fix the checkout timeout"
-      },
-      {
-        "name": "action.blocked",
-        "type": "bool",
-        "value": "True"
+        "value": "send the event poster to the printer"
       }
     ]
   },
   "condition": {
     "filename": "release_gate.kedi",
-    "code": "[change] = Rename user_id to account_id in API responses.\n[track] = standard\n\n> if: <change> requires existing integrations to change\n  [track] := migration\n\n= <track>",
+    "code": "[change] = The response field user_id is being replaced by account_id.\n[track] = standard\n\n> if: The API change \"<change>\" breaks compatibility with existing clients\n  [track] := migration\n\n= <track>",
     "values": [
       {
         "name": "track",
@@ -54,7 +49,7 @@
   },
   "loop": {
     "filename": "grounded_copy.kedi",
-    "code": "[facts] = CSV export ships Monday. PDF is not available.\n[draft] = Export any report as CSV or PDF today.\n\n> loop: <draft> makes promises not supported by <facts>\n  >> A revision of <draft> supported only by <facts> would read [revision].\n  [draft] := <revision>\n\n= <draft>",
+    "code": "[facts] = CSV export ships Monday. PDF is not available.\n[draft] = Export any report as CSV or PDF today.\n\n> loop: The draft \"<draft>\" makes promises not supported by the facts \"<facts>\"\n  >> A revision of \"<draft>\" supported only by \"<facts>\" would read [revision].\n  [draft] := <revision>\n\n= <draft>",
     "values": [
       {
         "name": "draft",
@@ -113,7 +108,7 @@
   },
   "tool": {
     "filename": "stock_check.kedi",
-    "code": "```\nimport json\nfrom pathlib import Path\n```\n\n@stock(item: str) -> int:\n  = ```\n  path = Path(\"inventory.json\")\n  return json.loads(path.read_text())[item]\n  ```\n\n> approval: allow\n> use: stock\n>> The stock tool reports [remaining: int] units of \"field-notebook\". It is [can_fulfill: bool] that this can fill an order of 4.\n\n= `can_fulfill`",
+    "code": "```\nimport json\nfrom pathlib import Path\n```\n\n@stock(item: str) -> int:\n  = ```\n  path = Path(\"inventory.json\")\n  return json.loads(path.read_text())[item]\n  ```\n\n> approval: allow\n> use: stock\n>> The stock tool reports [remaining: int] units of \"field-notebook\".\n\n[can_fulfill: bool] = `remaining >= 4`\n= `can_fulfill`",
     "values": [
       {
         "name": "remaining",
@@ -129,7 +124,7 @@
   },
   "agent": {
     "filename": "release_team.kedi",
-    "code": "> import: filesystem\n> model: google/gemini-3-flash-preview\n\n> profile: researcher:\n  > instructions: Read CHANGELOG.md. Find required v2.0 migrations.\n  > use: read_text_file\n  > output: list[str]\n\n> profile: editor:\n  > subagent: researcher\n\n> use: editor\n>> The v2.0 migration checklist reported by the researcher is [steps: list[str]].\n\n= `steps`",
+    "code": "> import: filesystem\n> model: google/gemini-3-flash-preview\n\n> profile: researcher:\n  > instructions: Read CHANGELOG.md. Quote the v2.0 breaking changes.\n  > use: read_text_file\n  > output: list[str]\n\n> profile: editor:\n  > instructions: Turn the researcher's findings into concise migration steps.\n  > subagent: researcher\n\n> use: editor\n>> Based on the researcher's findings, API clients should follow [steps: list[str]] to migrate to v2.0.\n\n= `steps`",
     "values": [
       {
         "name": "steps",
@@ -140,7 +135,7 @@
   },
   "jev": {
     "filename": "ticket_triage.kedi",
-    "code": "> import: decisions\n> model: typesafe/jev-latest\n\n[ticket] = I was charged twice. Reverse it or I cancel today.\n\n>> <ticket> belongs to [queue: Literal[\"billing\", \"technical\"]]. The probability the customer intends to cancel is [churn: Probability].\n\n= `{\"queue\": queue, \"priority\": churn >= 0.80}`",
+    "code": "> import: decisions\n> model: typesafe/jev-latest\n\n[ticket] = I was charged twice. Reverse it or I cancel today.\n\n>> <ticket> belongs to [queue: Literal[\"billing\", \"technical\"]].\nThe cancellation intent is [cancellation_intent: Annotated[\n  Probability,\n  \"The customer states an intention to cancel their subscription.\"\n]].\n\n= `{\"queue\": queue, \"priority\": cancellation_intent >= 0.80}`",
     "values": [
       {
         "name": "queue",
@@ -148,7 +143,7 @@
         "value": "billing"
       },
       {
-        "name": "churn",
+        "name": "cancellation_intent",
         "type": "Probability",
         "value": "0.93"
       }

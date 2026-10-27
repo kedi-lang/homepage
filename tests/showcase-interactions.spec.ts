@@ -20,7 +20,7 @@ test('scope inspector matches the example and highlights only the selected sourc
   await expect(page.locator('#scope-editor')).toBeVisible();
   await expect(page.locator('#scope-researcher')).toBeHidden();
   await expect(selected).toHaveText(
-    [8, 9, 11, 12].map((index) => examples.agent.code.split('\n')[index]),
+    [8, 9, 10, 12, 13].map((index) => examples.agent.code.split('\n')[index]),
   );
   await expect(page.locator('#scope-editor')).toContainText(
     'CAPTURE AT THE CALL SITE',

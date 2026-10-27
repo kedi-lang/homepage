@@ -93,7 +93,7 @@
     gap: 24px;
     grid-template-columns: 1fr 1fr;
   }
-  .harness-statement {
+  .harness-copy h2 {
     font-size: 38px;
   }
   .start-section {
@@ -245,6 +245,17 @@
     justify-content: flex-start;
     padding-right: 63px;
   }
+  .movie-links .install-command {
+    gap: 6px;
+    padding: 6px 8px;
+  }
+  .movie-links .install-command code {
+    font-size: 12px;
+  }
+  .movie-links .install-command .icon-button {
+    width: 20px;
+    height: 20px;
+  }
   .install-caption {
     display: none;
   }
@@ -363,10 +374,8 @@
     grid-template-columns: 1fr;
     gap: 35px;
   }
-  .harness-statement {
-    font-size: 39px;
-  }
   .harness-copy h2 {
+    font-size: 39px;
     margin-top: 20px;
   }
   .harness-art {

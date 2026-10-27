@@ -10,6 +10,8 @@ import {
   Terminal,
   BookOpen,
   PawPrint,
+  Copy,
+  Check,
 } from '@lucide/astro';
 import CodeWindow from '../components/CodeWindow.astro';
 import Brand from '../components/Brand.astro';
@@ -127,11 +129,29 @@ const discord = 'https://discord.gg/cuSbZd5he';
           </p>
           <div class="hero-demo">
             <CodeWindow example={examples.hello} id="hero" replay />
-            <a class="text-link movie-tool-source" href="/examples/tmdb.kedi">
-              tmdb.kedi · Tool source <ArrowUpRight size={14} />
-            </a>
+            <div class="movie-links">
+              <Install />
+              <div class="install-command text-link movie-tool-source">
+                <code>kedi add tmdb</code>
+                <button
+                  class="icon-button"
+                  type="button"
+                  data-copy-command
+                  aria-label="Copy TMDB install command"
+                  data-tooltip="Copy command"
+                >
+                  <Copy size={17} class="copy-icon" />
+                  <Check size={17} class="copied-icon" />
+                </button>
+              </div>
+              <a
+                class="text-link movie-tool-source"
+                href="/examples/movie-night/"
+              >
+                Run this example <ArrowRight size={14} />
+              </a>
+            </div>
           </div>
-          <Install />
         </div>
         <button
           class="cat-button"
@@ -159,7 +179,6 @@ const discord = 'https://discord.gg/cuSbZd5he';
         <div class="container">
           <div class="section-kicker">
             <span>02 / NATURAL CONTROL FLOW</span>
-            <span class="side-note">WORDS CAN BE CONDITIONS, TOO.</span>
           </div>
           <div class="section-heading-row">
             <div>
@@ -170,9 +189,8 @@ const discord = 'https://discord.gg/cuSbZd5he';
               </h2>
             </div>
             <p>
-              Let a model evaluate a claim.
-              <br />
-              Let your program decide what happens next.
+              Let a model evaluate a claim and your program decide what happens
+              next.
             </p>
           </div>
           <Tabs
@@ -193,7 +211,6 @@ const discord = 'https://discord.gg/cuSbZd5he';
             >
               <CodeWindow example={examples.condition} id="if" />
               <div class="flow-aside">
-                <span class="tiny-label">ONE CLAIM. TWO PATHS.</span>
                 <p class="claim-text">
                   Does this API change <br />
                   need a migration?
@@ -229,7 +246,6 @@ const discord = 'https://discord.gg/cuSbZd5he';
             >
               <CodeWindow example={examples.loop} id="loop" />
               <div class="flow-aside">
-                <span class="tiny-label">CHECK. REVISE. CHECK AGAIN.</span>
                 <ol class="loop-steps">
                   <li>
                     <span>01</span>
@@ -268,7 +284,6 @@ const discord = 'https://discord.gg/cuSbZd5he';
             >
               <CodeWindow example={examples.map} id="map" />
               <div class="flow-aside">
-                <span class="tiny-label">ONE CONTINUATION PER ITEM.</span>
                 <ol class="loop-steps">
                   <li>
                     <span>01</span>
@@ -314,8 +329,7 @@ const discord = 'https://discord.gg/cuSbZd5he';
       >
         <div class="container">
           <div class="section-kicker">
-            <span>03 / A LANGUAGE, NOT AN ISLAND</span>
-            <span class="side-note">KEEP YOUR PYTHON CLOSE.</span>
+            <span>03 / PYTHON INTEROP</span>
           </div>
           <h2 id="compose-title">Keep writing your program.</h2>
           <p class="section-intro">
@@ -371,8 +385,8 @@ const discord = 'https://discord.gg/cuSbZd5he';
                       <Terminal size={25} />
                       <h3>Tools, in context.</h3>
                       <p>
-                        The model checks actual stock before answering. A Kedi
-                        procedure reads the inventory through Python.
+                        The model retrieves stock through a Kedi tool. Python
+                        checks whether there are enough units for the order.
                       </p>
                       <a class="text-link" href="/examples/inventory.json">
                         Example inventory <ArrowRight size={15} />
@@ -417,11 +431,6 @@ const discord = 'https://discord.gg/cuSbZd5he';
           <div class="harness-copy">
             <span class="eyebrow coming-soon">COMING SOON</span>
             <h2 id="harness-title">Kedi Harness</h2>
-            <p class="harness-statement">
-              An agent harness.
-              <br />
-              With a mind of its own.
-            </p>
             <p>
               Meet the cat taking the keyboard. An agent harness for your
               projects, with Kedi as its orchestration language. It can write
@@ -440,9 +449,6 @@ const discord = 'https://discord.gg/cuSbZd5he';
               alt="The tuxedo cat at a retro computer, with a glass of Turkish tea beside the keyboard"
               loading="lazy"
             />
-            <figcaption>
-              LEARNING TO RUN THE SHOW. TEA BREAKS INCLUDED.
-            </figcaption>
           </figure>
         </div>
       </section>
@@ -523,7 +529,9 @@ const discord = 'https://discord.gg/cuSbZd5he';
             Discord <ArrowUpRight size={14} />
           </a>
         </nav>
-        <span class="footer-copyright">© 2026 kedi contributors</span>
+        <span class="footer-copyright">
+          © 2026 <a href="#team">kedi contributors</a>
+        </span>
       </div>
     </footer>
     <div class="sr-only" role="status" id="copy-status"></div>

@@ -238,17 +238,12 @@ mark {
   color: #365645;
 }
 .harness-copy h2 {
-  font-size: 22px;
-  font-weight: 550;
-  margin-top: 23px;
-}
-.harness-statement {
   font-size: 46px;
   font-weight: 620;
   line-height: 1.12;
-  margin-top: 12px;
+  margin-top: 23px;
 }
-.harness-copy > p:not(.harness-statement) {
+.harness-copy > p {
   color: #4e6267;
   margin-top: 23px;
   font-size: 16px;

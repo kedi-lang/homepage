@@ -1,11 +1,13 @@
-# HTTP support for the movie example.
 ```
 import os
 import httpx
 ```
 
-# Find a movie by title; supply a year to distinguish remakes.
 @movie_details(title: str, year: int = `0`) -> dict:
+  ###
+  Search TMDB by movie title and optional release year. Return title, release_date,
+  runtime in minutes, and directors. Supply a year when the title is ambiguous.
+  ###
   = ```
   query = title.strip()
   if not query:

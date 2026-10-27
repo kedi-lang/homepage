@@ -1,6 +1,6 @@
 # Kedi Homepage
 
-Home of lovely cats. Source repository: [kedi-lang/homepage](https://github.com/kedi-lang/homepage).
+Source repository for [kedi-lang.org](https://kedi-lang.org): [kedi-lang/homepage](https://github.com/kedi-lang/homepage).
 
 Standalone, static Astro website. No Kedi runtime, notebook, Python, model
 credentials, analytics, or backend is required to serve the site.
@@ -45,15 +45,17 @@ artifact. Only the built `dist/` directory is a publishable website output.
 ## Scope
 
 - Istanbul hero with a separate interactive pixel cat.
-- A TMDB movie lookup, typed action, API migration check, grounded-copy loop, and a loop/map
+- A TMDB movie lookup, a typed next-action record, API migration check, grounded-copy loop, and a loop/map
   issue inbox. Python calculates a quote; a reusable procedure builds a handoff.
-- The stock tool reads `public/examples/inventory.json`. Place it in the
+- The stock tool reads `public/examples/inventory.json`; Python compares the result to the order size. Place it in the
   program's cwd as `inventory.json` when running the displayed example.
 - A release-team example combining profiles, a file-reading tool, a typed
-  subagent result, and template outputs. The fictional input changelog is in
+  subagent result, and template outputs. The researcher quotes breaking changes;
+  the editor turns those findings into migration steps. The fictional input changelog is in
   `public/examples/CHANGELOG.md`; the program reads `CHANGELOG.md` from its cwd.
 - One compact Kedi + Jev example: a `Literal` queue choice and a cancellation
-  `Probability` share one request. Python applies the priority rule locally.
+  `Probability` with an explicit cancellation-intent criterion share one request.
+  Python applies the priority rule locally.
   The threshold is illustrative application policy, not a calibration result.
 - Kedi Harness teaser explicitly marked coming soon.
 - An interactive section with Notebook and Terminal REPL playback, `kedi notebook` launch
@@ -98,9 +100,13 @@ or measured recordings. Replay is visual playback only. There are no model
 latency, accuracy, or cost claims. The examples are stored in
 `src/data/examples.json`; rendered code and clipboard text share that source.
 Only the introductory movie example has explanatory comments. The hero imports the HTTPX-backed
-tool from `public/examples/tmdb.kedi`, linked beneath the example. This is a local
-example module, not a built-in Kedi package; it must sit alongside `movie_night.kedi`.
+tool from the [tmdb registry package](https://registry.kedi-lang.org/package/tmdb),
+installed with `kedi add tmdb`. Its manifest installs HTTPX automatically.
 The copy button copies the displayed main program.
+The linked `/examples/movie-night/` guide supplies the main program download, a source-based
+installation command, provider setup, and the distinction between TMDB's API key
+and API Read Access Token. It does not claim that the current PyPI release includes
+the development syntax.
 
 The header, footer, and favicon use the supplied monochrome Kedi emblem.
 Its original JPEG and reproducible transparent extraction are in `assets/source/`.
@@ -129,7 +135,9 @@ an arbitrary match; `movie_details("Dune", 1984)` can distinguish remakes.
 No MCP server, Node.js, or
 localhost port is needed. No credential is embedded in the example or sent by
 the homepage. Tests run the actual tool with mocked HTTP responses, not live
-TMDB requests. The example allows its registered tool to execute automatically.
+TMDB requests, using a source snapshot in `tests/fixtures/tmdb.kedi`; this fixture
+is not published as a downloadable tool. The example allows its registered tool
+to execute automatically.
 
 ## Verification
 

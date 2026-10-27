@@ -11,7 +11,8 @@ import examples from '../data/examples.json';
 
 const guide = 'https://docs.kedi-lang.org/agent-adapters/typesafe/';
 const probability = Number(
-  examples.jev.values.find((value) => value.name === 'churn')!.value,
+  examples.jev.values.find((value) => value.name === 'cancellation_intent')!
+    .value,
 );
 ---
 
