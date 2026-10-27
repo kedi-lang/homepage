@@ -10,8 +10,6 @@ import {
   Terminal,
   BookOpen,
   PawPrint,
-  Copy,
-  Check,
 } from '@lucide/astro';
 import CodeWindow from '../components/CodeWindow.astro';
 import Brand from '../components/Brand.astro';
@@ -131,19 +129,6 @@ const discord = 'https://discord.gg/cuSbZd5he';
             <CodeWindow example={examples.hello} id="hero" replay />
             <div class="movie-links">
               <Install />
-              <div class="install-command text-link movie-tool-source">
-                <code>kedi add tmdb</code>
-                <button
-                  class="icon-button"
-                  type="button"
-                  data-copy-command
-                  aria-label="Copy TMDB install command"
-                  data-tooltip="Copy command"
-                >
-                  <Copy size={17} class="copy-icon" />
-                  <Check size={17} class="copied-icon" />
-                </button>
-              </div>
               <a
                 class="text-link movie-tool-source"
                 href="/examples/movie-night/"

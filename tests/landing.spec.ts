@@ -12,9 +12,7 @@ test('social covers are excluded from the publishable output', () => {
 
 test('movie example explains its statements and replays the template, not a comment', async ({
   page,
-  context,
 }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.clock.install();
   await page.goto('/');
   const hero = page.locator('[data-demo="hero"]');
@@ -34,10 +32,20 @@ test('movie example explains its statements and replays the template, not a comm
   const template = hero.locator('[data-replay-phase="template"]');
   await expect(template).toContainText('>> Look up Spirited Away');
   expect(examples.hello.code.split('\n').length).toBeLessThanOrEqual(12);
-  await page.getByRole('button', { name: 'Copy TMDB install command' }).click();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    'kedi add tmdb',
+  const importLink = hero.getByRole('link', {
+    name: 'View tmdb package in the registry',
+  });
+  await expect(importLink).toHaveAttribute(
+    'href',
+    'https://registry.kedi-lang.org/package/tmdb',
   );
+  await importLink.hover();
+  await expect(importLink).toHaveCSS('background-color', 'rgb(216, 232, 215)');
+  await expect(
+    page.locator(
+      '.movie-links a[href="https://registry.kedi-lang.org/package/tmdb"]',
+    ),
+  ).toHaveCount(0);
   await expect(template.locator('.syntax-comment')).toHaveCount(0);
   await hero
     .getByRole('button', { name: 'Replay movie_night.kedi example' })
@@ -52,7 +60,9 @@ test('movie example explains its statements and replays the template, not a comm
 
 test('movie setup installs the registry package and states the required credentials', async ({
   page,
+  context,
 }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/');
   await page.getByRole('link', { name: 'Run this example' }).click();
   await expect(
@@ -61,6 +71,26 @@ test('movie setup installs the registry package and states the required credenti
   await expect(page.locator('main')).toContainText('API Read Access Token');
   await expect(page.locator('main')).toContainText('GOOGLE_API_KEY');
   await expect(page.locator('main')).toContainText('kedi add tmdb');
+  await expect(page.locator('main')).not.toContainText('git+https');
+  await page.getByRole('button', { name: 'Copy TMDB install command' }).click();
+  await expect(
+    page
+      .getByRole('button', { name: 'Copy TMDB install command' })
+      .locator('.copied-icon'),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole('button', { name: 'Copy TMDB install command' })
+      .locator('.copy-icon'),
+  ).toBeHidden();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    'uv run kedi add tmdb',
+  );
+  await expect(
+    page
+      .getByRole('button', { name: 'Copy TMDB install command' })
+      .locator('.copy-icon'),
+  ).toBeVisible({ timeout: 3000 });
   await expect(
     page.getByRole('link', { name: 'tmdb registry package' }),
   ).toHaveAttribute('href', 'https://registry.kedi-lang.org/package/tmdb');
@@ -190,26 +220,25 @@ for (const width of [320, 390, 768, 1440, 1920]) {
       'object-position',
       '50% 100%',
     );
-    const toolSource = page.locator('.movie-links > .install-command');
+    const toolSource = page.getByRole('link', { name: 'Run this example' });
     await expect(toolSource).toHaveCSS(
       'background-color',
       'rgb(245, 246, 242)',
     );
     await expect(toolSource).toHaveCSS('color', 'rgb(32, 39, 34)');
-    const commands = page.locator('.movie-links .install-command');
-    await expect(commands.locator('code')).toHaveText([
-      'uv add kedi',
-      'kedi add tmdb',
-    ]);
-    const installBox = await commands.nth(0).boundingBox();
-    const packageBox = await commands.nth(1).boundingBox();
+    const install = page.locator('.movie-links .install-command');
+    await expect(install.locator('code')).toHaveText('uv add kedi');
+    const installBox = await install.boundingBox();
     const runBox = await page
       .getByRole('link', { name: 'Run this example' })
       .boundingBox();
-    expect(Math.abs(installBox!.y - packageBox!.y)).toBeLessThan(2);
-    expect(installBox!.x + installBox!.width).toBeLessThan(packageBox!.x);
+    if (Math.abs(installBox!.y - runBox!.y) < 6) {
+      expect(installBox!.x + installBox!.width).toBeLessThan(runBox!.x);
+    } else {
+      expect(runBox!.y).toBeGreaterThan(installBox!.y);
+    }
     if (width >= 768)
-      expect(Math.abs(packageBox!.y - runBox!.y)).toBeLessThan(6);
+      expect(Math.abs(installBox!.y - runBox!.y)).toBeLessThan(6);
     await expect(
       page.getByRole('link', { name: 'kedi contributors', exact: true }),
     ).toHaveAttribute('href', '#team');

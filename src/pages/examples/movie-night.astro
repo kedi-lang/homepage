@@ -1,5 +1,5 @@
 ---
-import { ArrowLeft, ArrowUpRight, Download } from '@lucide/astro';
+import { ArrowLeft, ArrowUpRight, Download, Copy, Check } from '@lucide/astro';
 import examples from '../../data/examples.json';
 import { highlight } from '../../lib/highlight';
 import '@fontsource-variable/geist';
@@ -44,7 +44,8 @@ import '../../styles/global.css';
       <section aria-labelledby="files-title">
         <h2 id="files-title">1. Get the program</h2>
         <p>
-          Download the program below. Its movie lookup tool is supplied by the
+          Download the program into your project directory. Its movie lookup
+          tool is supplied by the{' '}
           <a href="https://registry.kedi-lang.org/package/tmdb">
             tmdb registry package
           </a>
@@ -59,28 +60,49 @@ import '../../styles/global.css';
       <section aria-labelledby="setup-title">
         <h2 id="setup-title">2. Prepare the environment</h2>
         <p>
-          Use Python 3.11 or newer. Until the next PyPI release, install Kedi
-          from its stable branch. These commands create a separate environment
-          on macOS or Linux:
+          In a uv project with Python 3.11 or newer, install Kedi and the Google
+          model provider:
         </p>
-        <pre><code>uv venv --python 3.12
-source .venv/bin/activate
-uv pip install 'kedi @ git+https://github.com/kedi-lang/kedi@stable' 'pydantic-ai-slim[google]'
-kedi add tmdb</code></pre>
+        <div class="guide-command">
+          <div class="command-title">
+            <span>INSTALL DEPENDENCIES</span>
+            <button
+              type="button"
+              data-copy-guide
+              aria-label="Copy dependency install command"
+              title="Copy command"
+            >
+              <Copy size={16} class="copy-icon" />
+              <Check size={16} class="copied-icon" />
+            </button>
+          </div>
+          <pre><code>uv add kedi 'pydantic-ai-slim[google]'</code></pre>
+        </div>
+        <p>Add the TMDB package to your Kedi registry:</p>
+        <div class="guide-command">
+          <div class="command-title">
+            <span>INSTALL PACKAGE</span>
+            <button
+              type="button"
+              data-copy-guide
+              aria-label="Copy TMDB install command"
+              title="Copy command"
+            >
+              <Copy size={16} class="copy-icon" />
+              <Check size={16} class="copied-icon" />
+            </button>
+          </div>
+          <pre><code>uv run kedi add tmdb</code></pre>
+        </div>
         <p>
-          <code>kedi add tmdb</code> installs the verified package and its
-          <code>httpx</code> dependency into this environment.
-        </p>
-        <p>
-          For other installation options, see the
+          The package installs its HTTPX dependency into the same environment.
+          See the{' '}
+          <a href="https://registry.kedi-lang.org/package/tmdb">tmdb package</a>{' '}
+          and the{' '}
           <a href="https://docs.kedi-lang.org/getting-started/installation/">
-            installation guide
+            Kedi installation guide
           </a>
           .
-        </p>
-        <p>
-          <a href="https://registry.kedi-lang.org/package/tmdb">Install tmdb</a>
-          from the registry with <code>kedi add tmdb</code>.
         </p>
       </section>
       <section aria-labelledby="keys-title">
@@ -94,7 +116,7 @@ kedi add tmdb</code></pre>
 TMDB_API_KEY=your-tmdb-read-access-token</code></pre>
         <p>
           Keep <code>.env</code> out of version control. The keys are used by
-          your local program, never by this website.
+          your local program, never by this website.{' '}
           <a href="https://developer.themoviedb.org/docs/getting-started">
             TMDB setup <ArrowUpRight size={13} />
           </a>
@@ -102,7 +124,21 @@ TMDB_API_KEY=your-tmdb-read-access-token</code></pre>
       </section>
       <section aria-labelledby="run-title">
         <h2 id="run-title">4. Run the program</h2>
-        <pre><code>kedi movie_night.kedi --adapter-model google/gemini-3-flash-preview</code></pre>
+        <div class="guide-command">
+          <div class="command-title">
+            <span>RUN</span>
+            <button
+              type="button"
+              data-copy-guide
+              aria-label="Copy run command"
+              title="Copy command"
+            >
+              <Copy size={16} class="copy-icon" />
+              <Check size={16} class="copied-icon" />
+            </button>
+          </div>
+          <pre><code>uv run kedi movie_night.kedi --adapter-model google/gemini-3-flash-preview</code></pre>
+        </div>
         <p>
           The model can call <code>movie_details</code> to search for the title
           and read its details. The template binds three values; the final
@@ -118,6 +154,37 @@ TMDB_API_KEY=your-tmdb-read-access-token</code></pre>
         </p>
       </section>
     </main>
+    <script>
+      const copyTimers = new WeakMap<HTMLButtonElement, number>();
+      document
+        .querySelectorAll<HTMLButtonElement>('[data-copy-guide]')
+        .forEach((button) => {
+          button.addEventListener('click', async () => {
+            const code = button
+              .closest('.guide-command')
+              ?.querySelector('code');
+            if (!code) return;
+            try {
+              await navigator.clipboard.writeText(code.textContent ?? '');
+              window.clearTimeout(copyTimers.get(button));
+              button.classList.add('is-copied');
+              button.title = 'Copied';
+              copyTimers.set(
+                button,
+                window.setTimeout(() => {
+                  button.classList.remove('is-copied');
+                  button.title = 'Copy command';
+                }, 1600),
+              );
+            } catch {
+              const range = document.createRange();
+              range.selectNodeContents(code);
+              window.getSelection()?.removeAllRanges();
+              window.getSelection()?.addRange(range);
+            }
+          });
+        });
+    </script>
   </body>
 </html>
 
@@ -173,6 +240,44 @@ TMDB_API_KEY=your-tmdb-read-access-token</code></pre>
     border: 1px solid var(--line);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+  }
+  .guide-command {
+    margin-top: 18px;
+    border: 1px solid #9aa69b;
+    background: var(--white);
+    min-width: 0;
+  }
+  .command-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 10px 7px 14px;
+    background: #e3e8e2;
+    border-bottom: 1px solid #aeb9ae;
+    font: 11px/1.4 var(--mono);
+    color: #43574c;
+  }
+  .command-title button {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    background: transparent;
+  }
+  .command-title button:hover,
+  .command-title button:focus-visible {
+    background: #d2dfd2;
+  }
+  .guide-command pre {
+    margin: 0;
+    padding: 14px;
+    border: 0;
+    overflow-x: auto;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    font: 13px/1.7 var(--mono);
   }
   .downloads {
     display: flex;
