@@ -9,12 +9,12 @@ for (const width of [320, 390, 768, 1440]) {
     await page.evaluate(() => document.fonts.ready);
 
     const sentences = [
-      ['#language-title', 'From a sentence to a typed value.'],
+      ['#language-title', 'Templates and typed values'],
       [
         '#language .section-intro',
         'The context, the question, and the shape of the answer. All in the same line of your program.',
       ],
-      ['.capture-summary h3', 'Not a string you have to untangle.'],
+      ['.capture-summary h3', 'Using captured values'],
       ['.claim-text', 'Does this API change need a migration?'],
       ['#compose-panel-python h3', 'A backtick away from Python.'],
     ];
