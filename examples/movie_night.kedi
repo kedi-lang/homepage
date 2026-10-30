@@ -1,0 +1,11 @@
+# Load the movie lookup tool.
+> import: tmdb
+# Let the model use it.
+> approval: allow
+> use: movie_details
+
+# Find the film by name and capture its details.
+>> Look up Spirited Away using movie_details. Its director is [director: str], release year [year: int], and runtime [minutes: int] minutes.
+
+# Use the result as a program value.
+= <director>

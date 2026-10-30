@@ -1,0 +1,16 @@
+> import: filesystem
+> model: google/gemini-3-flash-preview
+
+> profile: researcher:
+  > instructions: Read CHANGELOG.md. Quote the v2.0 breaking changes.
+  > use: read_text_file
+  > output: list[str]
+
+> profile: editor:
+  > instructions: Turn the researcher's findings into concise migration steps.
+  > subagent: researcher
+
+> use: editor
+>> Based on the researcher's findings, API clients should follow [steps: list[str]] to migrate to v2.0.
+
+= `steps`
